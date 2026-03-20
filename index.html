@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DIF — District Categorisation Tool v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+–bg:#faf8f4; –surface:#ffffff; –border:#e2ddd6; –border2:#c8c0b4;
+–ink:#1a1610; –ink2:#3a3428; –muted:#8a7f72; –muted2:#b0a898;
+–gold:#b8860b; –gold-lt:#fdf6e3; –gold-bd:#e8d5a0;
+–teal:#1e6b66; –teal-lt:#edf6f5; –teal-bd:#90ccc8;
+–green:#1a5c2a; –green-lt:#eef7f0; –green-bd:#90c8a0;
+–blue:#1a3a6b; –blue-lt:#eef2f8; –blue-bd:#90b0d8;
+–red:#8b1a1a; –red-lt:#fdf0f0;
+–amber:#7a4a00; –amber-lt:#fef4e4;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:‘EB Garamond’,Georgia,serif;background:var(–bg);color:var(–ink);min-height:100vh;font-size:16px;line-height:1.6;}
+
+/* HEADER */
+.hdr{background:var(–ink);color:#f0ece4;padding:18px 36px;display:flex;justify-content:space-between;align-items:center;}
+.hdr-eyebrow{font-family:‘JetBrains Mono’,monospace;font-size:9px;letter-spacing:3px;color:#6a6058;text-transform:uppercase;margin-bottom:3px;}
+.hdr h1{font-size:21px;font-weight:600;}
+.hdr-sub{font-size:12px;color:#6a6058;margin-top:2px;}
+.steps{display:flex;gap:6px;align-items:center;}
+.sd{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:‘JetBrains Mono’,monospace;font-size:12px;font-weight:600;border:2px solid #3a3428;color:#6a6058;transition:all .3s;}
+.sd.active{background:var(–gold);border-color:var(–gold);color:var(–ink);}
+.sd.done{background:#3a3428;border-color:#3a3428;color:#f0ece4;}
+.sl{width:22px;height:1px;background:#3a3428;}
+
+/* PAGES */
+.page{display:none;}.page.active{display:block;}
+
+/* SHARED */
+.wrap{max-width:1100px;margin:0 auto;padding:36px 36px;}
+.pg-title{font-size:26px;font-weight:700;margin-bottom:6px;}
+.pg-sub{font-size:14px;color:var(–muted);margin-bottom:28px;max-width:640px;line-height:1.6;}
+.panel{background:var(–surface);border:1px solid var(–border);border-radius:8px;padding:20px;}
+.panel-label{font-family:‘JetBrains Mono’,monospace;font-size:9px;letter-spacing:2px;color:var(–muted);text-transform:uppercase;margin-bottom:12px;}
+
+/* BUTTONS */
+.btn{padding:11px 28px;border-radius:6px;cursor:pointer;font-family:‘EB Garamond’,serif;font-size:15px;font-weight:600;transition:all .2s;border:none;}
+.btn-dark{background:var(–ink);color:#f0ece4;}.btn-dark:hover{background:#2a2418;}
+.btn-dark:disabled{background:#c0b8ae;cursor:not-allowed;}
+.btn-ghost{background:none;border:1px solid var(–border2);color:var(–ink2);}.btn-ghost:hover{border-color:var(–ink);color:var(–ink);}
+.btn-teal{background:var(–teal);color:#fff;}.btn-teal:hover{background:#155550;}
+.btn-amber{background:#8a5a00;color:#fff;}.btn-amber:hover{background:#6a4400;}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:24px;}
+
+/* PAGE 1 — LENS CARDS */
+.lens-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:28px;}
+.lcard{background:var(–surface);border:2px solid var(–border);border-radius:10px;padding:22px;cursor:pointer;transition:all .2s;position:relative;}
+.lcard:hover{border-color:var(–gold);box-shadow:0 4px 16px rgba(184,134,11,.1);}
+.lcard.sel{border-color:var(–gold);background:var(–gold-lt);}
+.lcard.sel::after{content:‘✓’;position:absolute;top:12px;right:14px;background:var(–gold);color:#fff;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;}
+.lcard-num{font-family:‘JetBrains Mono’,monospace;font-size:9px;letter-spacing:2px;color:var(–muted);text-transform:uppercase;margin-bottom:7px;}
+.lcard-title{font-size:16px;font-weight:700;margin-bottom:7px;}
+.lcard-story{font-size:12px;color:var(–ink2);margin-bottom:12px;line-height:1.5;}
+.lcard-formula{background:var(–bg);border:1px solid var(–border);border-radius:5px;padding:9px 11px;font-family:‘JetBrains Mono’,monospace;font-size:10px;color:var(–muted);line-height:1.8;}
+.lcard-formula b{color:var(–gold);}
+
+/* PAGE 2 — DATA */
+.lens-bar{background:var(–gold-lt);border:1px solid var(–gold-bd);border-radius:7px;padding:13px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;}
+.lb-title{font-size:14px;font-weight:700;color:var(–gold);}
+.lb-formula{font-family:‘JetBrains Mono’,monospace;font-size:10px;color:var(–amber);margin-top:2px;}
+.src-row{display:flex;gap:10px;margin-bottom:18px;}
+.src-btn{padding:8px 20px;border-radius:5px;border:2px solid var(–border);cursor:pointer;font-family:‘EB Garamond’,serif;font-size:14px;background:var(–surface);color:var(–ink2);transition:all .2s;}
+.src-btn.active{border-color:var(–teal);background:var(–teal-lt);color:var(–teal);font-weight:600;}
+.info-bar{border-radius:5px;padding:10px 14px;font-size:12px;margin-bottom:16px;}
+.info-teal{background:var(–teal-lt);border:1px solid var(–teal-bd);color:var(–teal);}
+.info-amber{background:var(–amber-lt);border:1px solid #e8c870;color:var(–amber);}
+.info-red{background:var(–red-lt);border:1px solid #e8a0a0;color:var(–red);}
+.dtbl-wrap{border:1px solid var(–border);border-radius:7px;overflow:hidden;overflow-x:auto;margin-bottom:16px;}
+.dtbl{width:100%;border-collapse:collapse;font-size:13px;}
+.dtbl th{background:var(–ink);color:#f0ece4;padding:9px 11px;text-align:left;font-family:‘JetBrains Mono’,monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:400;white-space:nowrap;}
+.dtbl th.vc{background:#1a4a46;}
+.dtbl td{padding:6px 11px;border-bottom:1px solid var(–border);vertical-align:middle;}
+.dtbl tr:last-child td{border-bottom:none;}
+.dtbl tr:nth-child(even) td{background:#faf8f4;}
+.dtbl tr:hover td{background:var(–gold-lt);}
+.dn{font-weight:600;white-space:nowrap;min-width:130px;}
+.dtbl input[type=number]{width:82px;padding:3px 7px;border:1px solid var(–border);border-radius:3px;font-family:‘JetBrains Mono’,monospace;font-size:11px;background:#fff;color:var(–ink);transition:border-color .15s;}
+.dtbl input:focus{outline:none;border-color:var(–gold);background:var(–gold-lt);}
+.dtbl input.edited{border-color:var(–teal);background:var(–teal-lt);}
+.dtbl input.miss{border-color:#e8a0a0;background:var(–red-lt);}
+.fnote{font-size:11px;color:var(–muted);line-height:1.6;padding:10px 14px;background:var(–surface);border:1px solid var(–border);border-radius:5px;margin-bottom:20px;}
+
+/* PAGE 3 — RESULTS */
+.break-controls{background:var(–surface);border:2px solid var(–gold-bd);border-radius:10px;padding:22px;margin-bottom:24px;}
+.bc-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+.bc-sub{font-size:13px;color:var(–muted);margin-bottom:18px;}
+.bc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:16px;}
+.bc-item label{display:block;font-family:‘JetBrains Mono’,monospace;font-size:9px;letter-spacing:2px;color:var(–muted);text-transform:uppercase;margin-bottom:8px;}
+input[type=range]{width:100%;accent-color:var(–gold);height:5px;}
+.bc-item input[type=number]{width:80px;padding:6px 10px;border:2px solid var(–gold-bd);border-radius:4px;font-family:‘JetBrains Mono’,monospace;font-size:14px;font-weight:600;color:var(–gold);text-align:center;background:var(–gold-lt);}
+.bc-item input[type=number]:focus{outline:none;border-color:var(–gold);}
+.bc-suggestion{background:var(–teal-lt);border:1px solid var(–teal-bd);border-radius:5px;padding:8px 12px;font-size:12px;color:var(–teal);display:flex;justify-content:space-between;align-items:center;}
+.btn-reset-break{padding:4px 12px;border:1px solid var(–teal-bd);border-radius:4px;background:none;color:var(–teal);cursor:pointer;font-size:11px;font-family:‘JetBrains Mono’,monospace;}
+.btn-reset-break:hover{background:var(–teal);color:#fff;}
+
+/* RANKED LIST */
+.ranked-wrap{border:1px solid var(–border);border-radius:8px;overflow:hidden;margin-bottom:24px;}
+.ranked-row{display:flex;align-items:center;padding:8px 14px;border-bottom:1px solid var(–border);cursor:pointer;transition:background .15s;gap:10px;font-size:13px;}
+.ranked-row:last-child{border-bottom:none;}
+.ranked-row.rA{background:var(–green-lt);}
+.ranked-row.rB{background:var(–blue-lt);}
+.ranked-row.rA:hover{background:#d8f0e0;}
+.ranked-row.rB:hover{background:#d8e4f4;}
+.ranked-row.break-here{border-top:3px dashed var(–gold);}
+.rr-rank{font-family:‘JetBrains Mono’,monospace;font-weight:700;color:var(–muted);width:32px;flex-shrink:0;}
+.rr-name{flex:1;font-weight:500;}
+.rr-bar-wrap{width:80px;height:5px;background:#e0d8d0;border-radius:3px;flex-shrink:0;}
+.rr-bar{height:100%;border-radius:3px;}
+.bar-A{background:var(–teal);}
+.bar-B{background:#6a8ab8;}
+.rr-score{font-family:‘JetBrains Mono’,monospace;font-size:11px;color:var(–muted);width:38px;text-align:right;flex-shrink:0;}
+.rr-pill{font-size:10px;padding:2px 8px;border-radius:10px;font-family:‘JetBrains Mono’,monospace;flex-shrink:0;}
+.pill-A{background:#c0e8cc;color:var(–green);}
+.pill-B{background:#b8d0e8;color:var(–blue);}
+.click-hint{background:var(–gold-lt);border:1px solid var(–gold-bd);border-radius:5px;padding:8px 14px;font-size:12px;color:var(–amber);margin-bottom:10px;}
+
+/* POOL SUMMARY */
+.pool-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;}
+.pool-card{border-radius:8px;padding:20px;border:2px solid;}
+.pA{background:var(–green-lt);border-color:var(–green-bd);}
+.pB{background:var(–blue-lt);border-color:var(–blue-bd);}
+.pc-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid;}
+.pA .pc-hdr{border-color:var(–green-bd);}
+.pB .pc-hdr{border-color:var(–blue-bd);}
+.pc-label{font-size:15px;font-weight:700;}
+.pA .pc-label{color:var(–green);}
+.pB .pc-label{color:var(–blue);}
+.pc-count{font-family:‘JetBrains Mono’,monospace;font-size:10px;padding:2px 9px;border-radius:10px;}
+.pA .pc-count{background:#b0dcc0;color:var(–green);}
+.pB .pc-count{background:#a8c8e0;color:var(–blue);}
+.pc-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.pc-chip{padding:3px 9px;border-radius:4px;font-size:11px;}
+.pA .pc-chip{background:#c8ecd4;color:var(–green);border:1px solid var(–green-bd);}
+.pB .pc-chip{background:#bcd4ec;color:var(–blue);border:1px solid var(–blue-bd);}
+
+/* JUSTIFICATIONS */
+.just-tabs{display:flex;gap:0;margin-bottom:0;border-bottom:2px solid var(–border);}
+.just-tab{padding:10px 22px;cursor:pointer;font-size:14px;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(–muted);transition:all .2s;}
+.just-tab.active{color:var(–ink);border-bottom-color:var(–gold);font-weight:600;}
+.just-content{background:var(–surface);border:1px solid var(–border);border-top:none;border-radius:0 0 8px 8px;padding:20px 24px;margin-bottom:24px;}
+.just-box{display:none;}
+.just-box.active{display:block;}
+.just-plain{font-size:15px;color:var(–ink2);line-height:1.8;font-style:italic;padding:4px 0;}
+.just-technical{font-size:13px;color:var(–ink2);line-height:1.7;}
+.just-technical .jt-section{margin-bottom:14px;}
+.just-technical .jt-label{font-family:‘JetBrains Mono’,monospace;font-size:9px;letter-spacing:2px;color:var(–muted);text-transform:uppercase;margin-bottom:4px;}
+.copy-btn{padding:5px 14px;border:1px solid var(–border2);border-radius:4px;background:none;cursor:pointer;font-size:11px;font-family:‘JetBrains Mono’,monospace;color:var(–muted);float:right;transition:all .2s;}
+.copy-btn:hover{background:var(–ink);color:#f0ece4;border-color:var(–ink);}
+.stats-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.stat-chip{background:var(–surface);border:1px solid var(–border);border-radius:6px;padding:10px 16px;text-align:center;min-width:100px;}
+.stat-val{font-size:20px;font-weight:700;color:var(–gold);font-family:‘JetBrains Mono’,monospace;}
+.stat-lbl{font-size:10px;color:var(–muted);margin-top:2px;}
+
+.hidden{display:none!important;}
+</style>
+
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-eyebrow">Government of Assam · DIF Index · Categorisation Module v2</div>
+    <h1>District Pool Categorisation Tool</h1>
+    <div class="hdr-sub">Statistical Handbook Assam 2025 · Census 2011 · 35 Districts</div>
+  </div>
+  <div class="steps">
+    <div class="sd active" id="sd1">1</div><div class="sl"></div>
+    <div class="sd" id="sd2">2</div><div class="sl"></div>
+    <div class="sd" id="sd3">3</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE 1 ═══════════════════════ -->
+
+<div class="page active" id="page1">
+<div class="wrap">
+  <div class="pg-title">Choose a Categorisation Lens</div>
+  <p class="pg-sub">Each lens uses a different combination of official variables from the Assam Statistical Handbook 2025 to produce a development character score for each district. Select the lens whose logic best supports your analytical purpose.</p>
+  <div class="lens-grid" id="lens-grid"></div>
+  <button class="btn btn-dark" id="btn-p2" onclick="goTo(2)" disabled>Proceed to Data &rarr;</button>
+</div>
+</div>
+
+<!-- ═══════════════════════ PAGE 2 ═══════════════════════ -->
+
+<div class="page" id="page2">
+<div class="wrap">
+  <div class="pg-title">Review &amp; Edit District Data</div>
+  <p class="pg-sub">Data is pre-filled from the Assam Statistical Handbook 2025. Click any value to edit it — edited cells turn green. Only the variables used by your selected lens are shown.</p>
+
+  <div class="lens-bar" id="lens-bar"></div>
+
+  <div class="src-row">
+    <button class="src-btn active" id="src-auto" onclick="setSrc('auto')">📖 Pre-filled from Handbook 2025</button>
+    <button class="src-btn" id="src-manual" onclick="setSrc('manual')">✏️ Enter All Data Manually</button>
+  </div>
+
+  <div class="info-bar info-teal" id="info-bar">✓ Values sourced from Statistical Handbook Assam 2025. Table reference shown in each column header. Click any cell to override.</div>
+  <div class="info-bar info-red">⚠ <strong>Bajali</strong> (carved from Barpeta, 2015) and <strong>Tamulpur</strong> (carved from Baksa, 2021) have no separate Census 2011 data. Their values are estimated from parent districts. Please verify and correct if you have district-specific figures.</div>
+
+  <div class="dtbl-wrap"><table class="dtbl"><thead id="dtbl-head"></thead><tbody id="dtbl-body"></tbody></table></div>
+  <div class="fnote" id="fnote"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo(1)">&larr; Back</button>
+    <button class="btn btn-dark" onclick="goTo(3)">Calculate Pools &rarr;</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════ PAGE 3 ═══════════════════════ -->
+
+<div class="page" id="page3">
+<div class="wrap">
+  <div class="pg-title" id="r-title"></div>
+  <p class="pg-sub" id="r-sub"></p>
+
+  <!-- STATS ROW -->
+
+  <div class="stats-row" id="stats-row"></div>
+
+  <!-- BREAK CONTROLS -->
+
+  <div class="break-controls">
+    <div class="bc-title">Set the Pool Break Point</div>
+    <div class="bc-sub">The tool suggests a break using the Jenks Natural Break method. You can override it three ways — all three controls are linked and update together.</div>
+    <div class="bc-grid">
+      <div class="bc-item">
+        <label>Drag to adjust rank cut-off</label>
+        <input type="range" id="break-slider" min="1" max="34" value="1" oninput="setBreak('slider',this.value)">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;"><span>Pool A = 1</span><span>Pool A = 34</span></div>
+      </div>
+      <div class="bc-item">
+        <label>Type a cut-off score directly</label>
+        <input type="number" id="break-score" step="0.1" oninput="setBreak('score',this.value)" placeholder="e.g. 35.0">
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;">Districts scoring above this → Pool A</div>
+      </div>
+      <div class="bc-item">
+        <label>Or click any district below</label>
+        <div style="background:var(--gold-lt);border:1px solid var(--gold-bd);border-radius:4px;padding:8px 10px;font-size:12px;color:var(--amber);line-height:1.5;">Click any district in the ranked list to set the break <em>just above</em> that district.</div>
+      </div>
+    </div>
+    <div class="bc-suggestion" id="bc-suggestion">
+      <span id="bc-suggest-text"></span>
+      <button class="btn-reset-break" onclick="resetToNatural()">↺ Reset to suggested break</button>
+    </div>
+  </div>
+
+  <!-- RANKED LIST -->
+
+  <div class="panel-label" style="margin-bottom:8px">Ranked Districts — Click any row to set break point just above it</div>
+  <div class="click-hint">💡 Click on any district row to move the pool break to just above that district. The pools update instantly.</div>
+  <div class="ranked-wrap" id="ranked-list"></div>
+
+  <!-- POOL SUMMARY -->
+
+  <div class="pool-grid" id="pool-grid"></div>
+
+  <!-- JUSTIFICATIONS -->
+
+  <div class="panel-label" style="margin-bottom:0">Justification Paragraphs</div>
+  <div class="just-tabs">
+    <div class="just-tab active" onclick="showJust('plain')">Plain English</div>
+    <div class="just-tab" onclick="showJust('technical')">Technical</div>
+  </div>
+  <div class="just-content">
+    <div class="just-box active" id="just-plain">
+      <button class="copy-btn" onclick="copyJust('plain')">Copy</button>
+      <div class="just-plain" id="just-plain-text"></div>
+    </div>
+    <div class="just-box" id="just-technical">
+      <button class="copy-btn" onclick="copyJust('technical')">Copy</button>
+      <div class="just-technical" id="just-tech-text"></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo(2)">&larr; Change Data</button>
+    <button class="btn btn-teal" onclick="exportCSV()">⬇ Export CSV (Excel)</button>
+    <button class="btn btn-amber" onclick="exportTXT()">⬇ Export Summary (TXT)</button>
+    <button class="btn btn-dark" onclick="goTo(1)">↺ Start Over</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// RAW DATA — Assam Statistical Handbook 2025 + Census 2011
+// ════════════════════════════════════════════════════════
+// Columns: name, area_km2, pop2011, urban_pop, density, towns, st_pct, literacy, is_new
+const RAW = [
+  ["Kamrup Metro",   955,  1253938,1037011,1313.0,12, 5.99, 88.71,false],
+  ["Cachar",        3786,  1736617, 315464, 458.7,19, 1.01, 79.34,false],
+  ["Jorhat",        1758,   924952, 220534, 526.1,11, 6.74, 82.78,false],
+  ["Tinsukia",      3790,  1327929, 264743, 350.4,13, 6.18, 69.66,false],
+  ["Dibrugarh",     3381,  1326335, 243730, 392.3, 9, 7.76, 76.05,false],
+  ["Hojai",         1422,   931218, 172350, 654.9, 9, 3.09, 75.08,false],
+  ["Nagaon",        2550,  1892550, 197184, 742.2, 8, 4.57, 71.04,false],
+  ["Dhubri",        1511,  1394144, 177539, 922.7, 9, 0.16, 61.23,false],
+  ["Goalpara",      1824,  1008183, 138062, 552.7,11,22.97, 67.37,false],
+  ["Kamrup",        3105,  1517542, 142394, 488.7,16,12.00, 75.55,false],
+  ["Nalbari",       1052,   771639,  82730, 733.5,11, 3.03, 78.63,false],
+  ["Barpeta",       2282,  1693622, 147353, 742.2, 9, 1.61, 63.81,false],
+  ["Bongaigaon",    1093,   738804, 109810, 675.9, 5, 2.55, 69.74,false],
+  ["Sivasagar",     1581,   692435,  80373, 438.0, 4, 5.39, 84.49,false],
+  ["Sribhumi",      1809,  1228686, 109700, 679.2, 7, 0.16, 78.22,false],
+  ["Morigaon",      1551,   957423,  73298, 617.3, 6,14.29, 68.03,false],
+  ["Sonitpur",      3409,  1311619, 142477, 384.8, 6,10.60, 68.56,false],
+  ["Golaghat",      3502,  1066888,  97736, 304.7, 7,10.48, 77.43,false],
+  ["Lakhimpur",     2277,  1042137,  91333, 457.7, 4,23.93, 77.20,false],
+  ["Hailakandi",    1327,   659296,  48140, 496.8, 3, 0.10, 74.33,false],
+  ["Darrang",       1585,   928500,  55494, 585.8, 3, 0.91, 63.08,false],
+  ["Dima Hasao",    4888,   214102,  62489,  43.8, 4,70.92, 77.54,false],
+  ["Chirang",       1923,   482162,  35337, 250.7, 3,37.06, 63.55,false],
+  ["Udalguri",      2012,   831668,  37574, 413.4, 3,32.15, 65.41,false],
+  ["Karbi Anglong", 7366,   660955,  95103,  89.7, 5,52.23, 71.81,false],
+  ["Baksa",         2457,   950075,  12242, 386.7, 2,34.84, 69.25,false],
+  ["Kokrajhar",     3296,   887142,  54941, 269.2, 4,31.41, 65.22,false],
+  ["Biswanath",     1796,   612491,  31368, 341.0, 2,15.21, 64.72,false],
+  ["Charaideo",     1087,   458615,  29723, 421.9, 3, 2.55, 74.11,false],
+  ["Dhemaji",       3237,   686133,  48285, 212.0, 4,47.45, 72.70,false],
+  ["South Salmara",  665,   555114,  26162, 834.8, 0, 0.73, 50.76,false],
+  ["Majuli",        1093,   167304,      0, 153.1, 0,46.38, 78.56,false],
+  ["West K.Anglong",3068,   295358,  17863,  96.3, 2,65.52, 63.35,false],
+  ["Bajali",        1094,   350000,  25000, 320.0, 1, 1.61, 63.81,true ],
+  ["Tamulpur",      1244,   280000,   8000, 225.0, 1,34.84, 69.25,true ],
+];
+
+const PLAINS = {"Kamrup Metro":100,"Cachar":85,"Jorhat":90,"Tinsukia":85,"Dibrugarh":85,"Hojai":90,"Nagaon":90,"Dhubri":100,"Goalpara":80,"Kamrup":90,"Nalbari":100,"Barpeta":100,"Bongaigaon":90,"Sivasagar":90,"Sribhumi":100,"Morigaon":90,"Sonitpur":80,"Golaghat":85,"Lakhimpur":80,"Hailakandi":85,"Darrang":90,"Dima Hasao":0,"Chirang":50,"Udalguri":60,"Karbi Anglong":0,"Baksa":60,"Kokrajhar":70,"Biswanath":80,"Charaideo":85,"Dhemaji":75,"South Salmara":100,"Majuli":20,"West K.Anglong":0,"Bajali":100,"Tamulpur":60};
+const BLOCKS = {"Kamrup Metro":3,"Cachar":15,"Jorhat":6,"Tinsukia":7,"Dibrugarh":7,"Hojai":5,"Nagaon":13,"Dhubri":11,"Goalpara":8,"Kamrup":14,"Nalbari":7,"Barpeta":12,"Bongaigaon":5,"Sivasagar":4,"Sribhumi":7,"Morigaon":5,"Sonitpur":7,"Golaghat":8,"Lakhimpur":9,"Hailakandi":5,"Darrang":5,"Dima Hasao":5,"Chirang":2,"Udalguri":6,"Karbi Anglong":7,"Baksa":5,"Kokrajhar":5,"Biswanath":7,"Charaideo":5,"Dhemaji":5,"South Salmara":3,"Majuli":2,"West K.Anglong":4,"Bajali":5,"Tamulpur":4};
+
+let DR = RAW.map(r=>({
+  name:r[0], area:r[1], pop:r[2], urban_pop:r[3],
+  urban_pct:+(r[3]/r[2]*100).toFixed(2),
+  density:r[4], towns:r[5], st_pct:r[6], literacy:r[7],
+  plains:PLAINS[r[0]]??80, blocks:BLOCKS[r[0]]??5, is_new:r[8]
+}));
+
+// ════════════════════════════════════════════════════════
+// LENSES
+// ════════════════════════════════════════════════════════
+const LENSES = [
+  { id:1, title:"Urban Character",
+    story:"Districts with fundamentally different urbanisation and economic structure should not be ranked together.",
+    formula:"Urban % &times; <b>0.45</b> &nbsp;+&nbsp; Density &times; <b>0.30</b> &nbsp;+&nbsp; No. of Towns &times; <b>0.25</b>",
+    formulaPlain:"Urban % (45%) + Population Density (30%) + Number of Towns (25%)",
+    vars:[
+      {key:"urban_pct", label:"Urban %",      src:"Table 1.03, Census 2011", unit:"%",    w:0.45},
+      {key:"density",   label:"Density /km²", src:"Table 1.02/1.03",         unit:"/km²", w:0.30},
+      {key:"towns",     label:"No. of Towns", src:"Table 1.02, Census 2011", unit:"",     w:0.25},
+    ],
+    score:(d,N)=> N.urban_pct(d.urban_pct)*0.45 + N.density(d.density)*0.30 + N.towns(d.towns)*0.25,
+    plainExplain:"how urban a district is, how densely populated it is, and how many towns it contains",
+    plainLogic:"Districts with more towns, higher population density, and a larger share of people living in urban areas were placed in Pool A. Districts where most people live in rural areas, with fewer towns and lower density, were placed in Pool B.",
+  },
+  { id:2, title:"Geographic & Ecological",
+    story:"Hill, riverine, and island districts face structural geographical barriers that plains districts simply do not.",
+    formula:"Density &times; <b>0.40</b> &nbsp;+&nbsp; (Inverse of Area) &times; <b>0.35</b> &nbsp;+&nbsp; Plains Character &times; <b>0.25</b>",
+    formulaPlain:"Population Density (40%) + Inverse of District Area (35%) + Plains Character Score (25%)",
+    vars:[
+      {key:"density", label:"Density /km²",  src:"Table 1.02/1.03",        unit:"/km²", w:0.40},
+      {key:"area",    label:"Area (km²)",    src:"Table 1.02, Census 2011", unit:"km²",  w:0.35, inv:true},
+      {key:"plains",  label:"Plains Score",  src:"Administrative records",  unit:"/100", w:0.25},
+    ],
+    score:(d,N)=> N.density(d.density)*0.40 + N.area_inv(1/d.area*10000)*0.35 + N.plains(d.plains)*0.25,
+    plainExplain:"population density, district size, and whether the district is located in the plains, hills, or a riverine/island setting",
+    plainLogic:"Smaller, denser districts located in the plains were placed in Pool A. Larger, sparsely populated hill districts, tribal areas, and geographically isolated districts like Majuli were placed in Pool B — recognising that their geography creates structural barriers to development that are outside their control.",
+  },
+  { id:3, title:"Administrative Maturity",
+    story:"Older, established districts have decades more institutional infrastructure than newly carved districts.",
+    formula:"No. of Towns &times; <b>0.50</b> &nbsp;+&nbsp; Density &times; <b>0.30</b> &nbsp;+&nbsp; No. of Blocks &times; <b>0.20</b>",
+    formulaPlain:"Number of Towns (50%) + Population Density (30%) + Number of CD Blocks (20%)",
+    vars:[
+      {key:"towns",  label:"No. of Towns", src:"Table 1.02, Census 2011", unit:"",     w:0.50},
+      {key:"density",label:"Density /km²", src:"Table 1.02/1.03",         unit:"/km²", w:0.30},
+      {key:"blocks", label:"CD Blocks",    src:"Table 1.02, Census 2011", unit:"",     w:0.20},
+    ],
+    score:(d,N)=> N.towns(d.towns)*0.50 + N.density(d.density)*0.30 + N.blocks(d.blocks)*0.20,
+    plainExplain:"how many towns a district has, how densely populated it is, and how many administrative blocks it contains",
+    plainLogic:"Districts with more towns, more administrative blocks, and higher density — indicating a more developed institutional and administrative infrastructure — were placed in Pool A. Districts with fewer towns and blocks, including several recently carved districts, were placed in Pool B.",
+  },
+  { id:4, title:"Population Scale",
+    story:"Scale determines delivery capacity. Larger districts have more resources and bandwidth. Small districts face inherent disadvantages.",
+    formula:"Total Population &times; <b>0.50</b> &nbsp;+&nbsp; Density &times; <b>0.30</b> &nbsp;+&nbsp; Urban % &times; <b>0.20</b>",
+    formulaPlain:"Total Population (50%) + Population Density (30%) + Urban % (20%)",
+    vars:[
+      {key:"pop",       label:"Population",  src:"Table 1.01, Handbook 2025", unit:"",   w:0.50},
+      {key:"density",   label:"Density /km²",src:"Table 1.02/1.03",           unit:"/km²",w:0.30},
+      {key:"urban_pct", label:"Urban %",     src:"Table 1.03, Census 2011",   unit:"%",  w:0.20},
+    ],
+    score:(d,N)=> N.pop(d.pop)*0.50 + N.density(d.density)*0.30 + N.urban_pct(d.urban_pct)*0.20,
+    plainExplain:"total population size, population density, and the share of urban population",
+    plainLogic:"Larger, more densely populated districts were placed in Pool A, reflecting their greater administrative capacity and resource base. Smaller districts — including recently created districts with limited population — were placed in Pool B.",
+  },
+  { id:5, title:"Tribal & Scheduled Area",
+    story:"Constitutional recognition of Scheduled and tribal areas acknowledges their structural difference. Rankings must respect that legal and social reality.",
+    formula:"(100 − ST %) &times; <b>0.50</b> &nbsp;+&nbsp; Urban % &times; <b>0.30</b> &nbsp;+&nbsp; Density &times; <b>0.20</b>",
+    formulaPlain:"Inverse of ST Population % (50%) + Urban % (30%) + Density (20%)",
+    vars:[
+      {key:"st_pct",    label:"ST Pop. %",   src:"Table 1.04, Census 2011", unit:"%",    w:0.50, inv:true},
+      {key:"urban_pct", label:"Urban %",     src:"Table 1.03, Census 2011", unit:"%",    w:0.30},
+      {key:"density",   label:"Density /km²",src:"Table 1.02/1.03",         unit:"/km²", w:0.20},
+    ],
+    score:(d,N)=> N.inv_st(100-d.st_pct)*0.50 + N.urban_pct(d.urban_pct)*0.30 + N.density(d.density)*0.20,
+    plainExplain:"the proportion of Scheduled Tribe population, the share of urban residents, and population density",
+    plainLogic:"Districts with low Scheduled Tribe population, higher urbanisation, and greater density were placed in Pool A. Districts with a high proportion of tribal population — many of which fall under the 6th Schedule, BTAD, or Hill District provisions of the Constitution — were placed in Pool B, consistent with the special protections already recognised by Indian law.",
+  },
+  { id:6, title:"Composite Development",
+    story:"Peer comparison requires similar developmental baselines across literacy, urbanisation, and population concentration.",
+    formula:"Urban % &times; <b>0.40</b> &nbsp;+&nbsp; Literacy Rate &times; <b>0.30</b> &nbsp;+&nbsp; Density &times; <b>0.30</b>",
+    formulaPlain:"Urban % (40%) + Literacy Rate (30%) + Population Density (30%)",
+    vars:[
+      {key:"urban_pct", label:"Urban %",      src:"Table 1.03, Census 2011", unit:"%",   w:0.40},
+      {key:"literacy",  label:"Literacy %",   src:"Table 1.05, Census 2011", unit:"%",   w:0.30},
+      {key:"density",   label:"Density /km²", src:"Table 1.02/1.03",         unit:"/km²",w:0.30},
+    ],
+    score:(d,N)=> N.urban_pct(d.urban_pct)*0.40 + N.literacy(d.literacy)*0.30 + N.density(d.density)*0.30,
+    plainExplain:"the share of urban population, the literacy rate, and population density",
+    plainLogic:"Districts with higher literacy, greater urbanisation, and denser populations — which together indicate a stronger baseline of human development — were placed in Pool A. Districts with lower literacy, predominantly rural populations, and sparser settlement were placed in Pool B.",
+  },
+];
+
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let selLens = null, dataSrc = 'auto', breakIdx = 1;
+let scored = [], naturalBreakIdx = 1, naturalGap = 0;
+
+// ════════════════════════════════════════════════════════
+// NORMALISATION
+// ════════════════════════════════════════════════════════
+function buildNorm(rows){
+  const mm = key => {
+    const v=rows.map(r=>r[key]), mn=Math.min(...v), mx=Math.max(...v);
+    return x => mx===mn ? 50 : (x-mn)/(mx-mn)*100;
+  };
+  const inv_area_vals = rows.map(r=>1/r.area*10000);
+  const mn_ia=Math.min(...inv_area_vals), mx_ia=Math.max(...inv_area_vals);
+  const inv_st_vals = rows.map(r=>100-r.st_pct);
+  const mn_is=Math.min(...inv_st_vals), mx_is=Math.max(...inv_st_vals);
+  return {
+    urban_pct:mm('urban_pct'), density:mm('density'), towns:mm('towns'),
+    pop:mm('pop'), literacy:mm('literacy'), st_pct:mm('st_pct'),
+    blocks:mm('blocks'), plains:mm('plains'),
+    area_inv: x => mx_ia===mn_ia?50:(x-mn_ia)/(mx_ia-mn_ia)*100,
+    inv_st:   x => mx_is===mn_is?50:(x-mn_is)/(mx_is-mn_is)*100,
+  };
+}
+
+function jenksBreak(s){
+  let maxG=0, ci=1;
+  for(let i=0;i<s.length-1;i++){
+    const g=s[i].score-s[i+1].score;
+    if(g>maxG){maxG=g;ci=i+1;}
+  }
+  return {ci, gap:maxG};
+}
+
+// ════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════
+function goTo(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById(`page${i}`).classList.toggle('active',i===n);
+    const d=document.getElementById(`sd${i}`);
+    d.className='sd'+(i<n?' done':i===n?' active':'');
+  });
+  if(n===2) renderPage2();
+  if(n===3) renderPage3();
+  window.scrollTo(0,0);
+}
+
+// ════════════════════════════════════════════════════════
+// PAGE 1
+// ════════════════════════════════════════════════════════
+function renderPage1(){
+  document.getElementById('lens-grid').innerHTML = LENSES.map(l=>`
+    <div class="lcard" id="lc${l.id}" onclick="pickLens(${l.id})">
+      <div class="lcard-num">LENS ${l.id} OF 6</div>
+      <div class="lcard-title">${l.title}</div>
+      <div class="lcard-story">${l.story}</div>
+      <div class="lcard-formula">
+        <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:3px">FORMULA</div>
+        ${l.formula}
+      </div>
+    </div>`).join('');
+}
+
+function pickLens(id){
+  selLens=id;
+  document.querySelectorAll('.lcard').forEach(c=>c.classList.remove('sel'));
+  document.getElementById(`lc${id}`).classList.add('sel');
+  document.getElementById('btn-p2').disabled=false;
+}
+
+// ════════════════════════════════════════════════════════
+// PAGE 2
+// ════════════════════════════════════════════════════════
+function setSrc(s){
+  dataSrc=s;
+  document.getElementById('src-auto').classList.toggle('active',s==='auto');
+  document.getElementById('src-manual').classList.toggle('active',s==='manual');
+  const ib=document.getElementById('info-bar');
+  if(s==='manual'){
+    ib.className='info-bar info-amber';
+    ib.textContent='✏️  Manual entry — all cells cleared. Enter values for each district.';
+  } else {
+    ib.className='info-bar info-teal';
+    ib.textContent='✓ Values from Statistical Handbook Assam 2025. Click any cell to override.';
+  }
+  buildTable();
+}
+
+function renderPage2(){
+  const l=LENSES.find(x=>x.id===selLens);
+  document.getElementById('lens-bar').innerHTML=`
+    <div><div class="lb-title">LENS ${l.id}: ${l.title.toUpperCase()}</div>
+    <div class="lb-formula">${l.formulaPlain}</div></div>
+    <div style="font-size:11px;color:var(--muted)">Only variables used by this lens are shown</div>`;
+  document.getElementById('fnote').innerHTML=
+    '<strong>Sources:</strong> '+l.vars.map(v=>`<strong>${v.label}:</strong> ${v.src}`).join(' &nbsp;·&nbsp; ')+
+    '. Bajali and Tamulpur values are estimated from parent districts (Barpeta and Baksa respectively).';
+  buildTable();
+}
+
+function buildTable(){
+  const l=LENSES.find(x=>x.id===selLens);
+  const vCols=l.vars.map(v=>`<th class="vc">${v.label}<br><span style="font-size:8px;color:#a0c8c4">${v.src} &nbsp;·&nbsp; wt:${v.w}</span></th>`).join('');
+  document.getElementById('dtbl-head').innerHTML=`<tr><th>District</th>${vCols}<th>Note</th></tr>`;
+  document.getElementById('dtbl-body').innerHTML=DR.map((d,i)=>{
+    const cells=l.vars.map(v=>{
+      let val=dataSrc==='manual'?'':+(v.key==='urban_pct'?d.urban_pct.toFixed(2):d[v.key]);
+      const cls=d.is_new?'miss':'';
+      return `<td><input type="number" step="0.01" class="${cls}" id="inp${i}_${v.key}" value="${val}"
+        onchange="updVal(${i},'${v.key}',this.value)" oninput="this.classList.add('edited')"></td>`;
+    }).join('');
+    const note=d.is_new?'<span style="color:#c04040;font-size:10px">⚠ Estimated</span>':'<span style="color:var(--teal);font-size:10px">Handbook 2025</span>';
+    return `<tr><td class="dn">${d.name}${d.is_new?'<sup style="font-size:8px;color:#c04040"> NEW</sup>':''}</td>${cells}<td>${note}</td></tr>`;
+  }).join('');
+}
+
+function updVal(i,k,v){
+  const p=parseFloat(v);
+  if(!isNaN(p)){
+    DR[i][k]=p;
+    if(k==='urban_pop'||k==='pop') DR[i].urban_pct=DR[i].urban_pop/DR[i].pop*100;
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// PAGE 3 — RESULTS
+// ════════════════════════════════════════════════════════
+function renderPage3(){
+  const l=LENSES.find(x=>x.id===selLens);
+  const N=buildNorm(DR);
+  scored=[...DR].map(d=>({name:d.name,score:Math.round(l.score(d,N)*10)/10,is_new:d.is_new}))
+    .sort((a,b)=>b.score-a.score);
+
+  const {ci,gap}=jenksBreak(scored);
+  naturalBreakIdx=ci; naturalGap=gap; breakIdx=ci;
+
+  document.getElementById('r-title').textContent=`Pool Results — ${l.title}`;
+  document.getElementById('r-sub').textContent=`35 districts scored and ranked. The Jenks Natural Break suggests a split at rank #${ci}/#${ci+1} (gap: ${gap.toFixed(1)} pts). You can adjust the break point below using any of the three controls.`;
+
+  // Slider setup
+  document.getElementById('break-slider').max=scored.length-1;
+  document.getElementById('break-slider').value=ci;
+
+  updateBreakDisplay();
+}
+
+function setBreak(source, val){
+  const s=scored;
+  if(source==='slider'){
+    breakIdx=parseInt(val);
+    document.getElementById('break-score').value=s[breakIdx-1]?s[breakIdx-1].score.toFixed(1):'';
+  } else if(source==='score'){
+    const sc=parseFloat(val);
+    if(isNaN(sc)) return;
+    let idx=s.findIndex(d=>d.score<sc);
+    if(idx===-1) idx=s.length;
+    breakIdx=idx;
+    document.getElementById('break-slider').value=idx;
+  } else if(source==='click'){
+    breakIdx=parseInt(val);
+    document.getElementById('break-slider').value=breakIdx;
+    document.getElementById('break-score').value=s[breakIdx-1]?s[breakIdx-1].score.toFixed(1):'';
+  }
+  updateBreakDisplay();
+}
+
+function resetToNatural(){
+  breakIdx=naturalBreakIdx;
+  document.getElementById('break-slider').value=breakIdx;
+  document.getElementById('break-score').value=scored[breakIdx-1]?scored[breakIdx-1].score.toFixed(1):'';
+  updateBreakDisplay();
+}
+
+function updateBreakDisplay(){
+  const l=LENSES.find(x=>x.id===selLens);
+  const poolA=scored.slice(0,breakIdx), poolB=scored.slice(breakIdx);
+  const maxScore=scored[0].score;
+  const isNatural=breakIdx===naturalBreakIdx;
+
+  // Suggestion bar
+  document.getElementById('bc-suggest-text').innerHTML=
+    `Jenks Natural Break suggests: Pool A = top <strong>${naturalBreakIdx}</strong> districts &nbsp;·&nbsp; Gap = <strong>${naturalGap.toFixed(1)}</strong> pts &nbsp;·&nbsp; `+
+    (isNatural?'<span style="color:var(--teal)">✓ Currently at suggested break</span>':'<span style="color:var(--amber)">⚠ Manually adjusted (was rank #'+naturalBreakIdx+')</span>');
+
+  // Stats row
+  const currentGap = breakIdx>0 && breakIdx<scored.length ? (scored[breakIdx-1].score-scored[breakIdx].score).toFixed(1) : '—';
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat-chip"><div class="stat-val" style="color:var(--green)">${poolA.length}</div><div class="stat-lbl">Pool A Districts</div></div>
+    <div class="stat-chip"><div class="stat-val" style="color:var(--blue)">${poolB.length}</div><div class="stat-lbl">Pool B Districts</div></div>
+    <div class="stat-chip"><div class="stat-val">${currentGap}</div><div class="stat-lbl">Break Gap (pts)</div></div>
+    <div class="stat-chip"><div class="stat-val">${scored[0].name.split(' ')[0]}</div><div class="stat-lbl">Highest Score</div></div>
+    <div class="stat-chip"><div class="stat-val">${scored[scored.length-1].name.split(' ')[0]}</div><div class="stat-lbl">Lowest Score</div></div>
+    <div class="stat-chip"><div class="stat-val" style="color:${isNatural?'var(--teal)':'var(--amber)'};font-size:13px">${isNatural?'Natural':'Manual'}</div><div class="stat-lbl">Break Method</div></div>`;
+
+  // Ranked list
+  document.getElementById('ranked-list').innerHTML=scored.map((d,i)=>{
+    const inA=i<breakIdx;
+    const isBreak=i===breakIdx;
+    return `<div class="ranked-row ${inA?'rA':'rB'}${isBreak?' break-here':''}" onclick="setBreak('click',${i+1})" title="Click to set break above this district">
+      <span class="rr-rank">#${i+1}</span>
+      <span class="rr-name">${d.name}${d.is_new?'<sup style="font-size:9px;color:#c04040"> *</sup>':''}</span>
+      <div class="rr-bar-wrap"><div class="rr-bar ${inA?'bar-A':'bar-B'}" style="width:${d.score/maxScore*100}%"></div></div>
+      <span class="rr-score">${d.score.toFixed(1)}</span>
+      <span class="rr-pill ${inA?'pill-A':'pill-B'}">${inA?'A':'B'}</span>
+    </div>`;
+  }).join('');
+
+  // Pool cards
+  document.getElementById('pool-grid').innerHTML=`
+    <div class="pool-card pA">
+      <div class="pc-hdr"><div class="pc-label">Pool A — Stronger / Urban Character</div><span class="pc-count">${poolA.length} districts</span></div>
+      <div class="pc-chips">${poolA.map(d=>`<span class="pc-chip">${d.name}</span>`).join('')}</div>
+    </div>
+    <div class="pool-card pB">
+      <div class="pc-hdr"><div class="pc-label">Pool B — Weaker / Rural Character</div><span class="pc-count">${poolB.length} districts</span></div>
+      <div class="pc-chips">${poolB.map(d=>`<span class="pc-chip">${d.name}</span>`).join('')}</div>
+    </div>`;
+
+  // Justifications
+  buildJustifications(l, poolA, poolB, currentGap, isNatural);
+
+  // Store for export
+  window._exp={l, scored, poolA, poolB, breakIdx, currentGap, isNatural};
+}
+
+function buildJustifications(l, poolA, poolB, gap, isNatural){
+  const pAnames=poolA.map(d=>d.name).join(', ');
+  const pBnames=poolB.map(d=>d.name).join(', ');
+  const breakMethod=isNatural?'a Jenks Natural Break classification, which identifies the largest gap in the distribution of scores':'expert review of the score distribution, with the break adjusted from the Jenks Natural Break suggestion to better reflect ground realities';
+
+  // PLAIN ENGLISH
+  document.getElementById('just-plain-text').innerHTML=`
+    <p style="margin-bottom:12px">"The 35 districts of Assam were divided into two pools for the purpose of the District Indicator Framework Index. The division was made on the basis of ${l.plainExplain} — three structural characteristics that are largely fixed and reflect the fundamental nature of each district rather than its recent performance on any indicator.</p>
+    <p style="margin-bottom:12px">${l.plainLogic}</p>
+    <p>This approach ensures that the DIF Index produces rankings that are meaningful and fair. A predominantly rural district is not penalised for lacking urban infrastructure, and a major urban district is not ranked below a rural one simply because rural indicators are easier to fulfil at scale. The two pools allow each district to be assessed against genuine peers. The data used is from the Statistical Handbook Assam 2025 and the Census of India 2011, both published by the Government."</p>`;
+
+  // TECHNICAL
+  document.getElementById('just-tech-text').innerHTML=`
+    <div class="jt-section">
+      <div class="jt-label">Methodology</div>
+      <div>A composite Urban Character Index was constructed for each of the 35 districts using the <strong>${l.title}</strong> lens. The formula applied was: <strong>${l.formulaPlain}</strong>. Each variable was independently normalised to a 0–100 scale using min-max normalisation: Score = (Value − Minimum) ÷ (Maximum − Minimum) × 100. Weighted scores were then summed to produce a final composite score for each district.</div>
+    </div>
+    <div class="jt-section">
+      <div class="jt-label">Break Point Determination</div>
+      <div>The pool boundary was determined using ${breakMethod}. The break was placed at a composite score gap of <strong>${gap} points</strong> between rank #${breakIdx} (${scored[breakIdx-1]?.name}) and rank #${breakIdx+1} (${scored[breakIdx]?.name}).</div>
+    </div>
+    <div class="jt-section">
+      <div class="jt-label">Data Sources</div>
+      <div>${l.vars.map(v=>`<strong>${v.label}:</strong> ${v.src}`).join(' &nbsp;·&nbsp; ')}. Note: Bajali and Tamulpur, being districts carved after the 2011 Census, have values estimated from parent district ratios.</div>
+    </div>
+    <div class="jt-section">
+      <div class="jt-label">Result</div>
+      <div><strong>Pool A (${poolA.length} districts):</strong> ${pAnames}.<br><strong>Pool B (${poolB.length} districts):</strong> ${pBnames}.</div>
+    </div>`;
+}
+
+function showJust(tab){
+  document.querySelectorAll('.just-tab').forEach((t,i)=>t.classList.toggle('active',['plain','technical'][i]===tab));
+  document.getElementById('just-plain').classList.toggle('active',tab==='plain');
+  document.getElementById('just-technical').classList.toggle('active',tab==='technical');
+}
+
+function copyJust(type){
+  const el=document.getElementById(type==='plain'?'just-plain-text':'just-tech-text');
+  navigator.clipboard?.writeText(el.innerText).catch(()=>{});
+  const btn=el.parentElement.querySelector('.copy-btn');
+  btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);
+}
+
+// ════════════════════════════════════════════════════════
+// EXPORT
+// ════════════════════════════════════════════════════════
+function exportCSV(){
+  const {l,scored,poolA,poolB,breakIdx}=window._exp;
+  const rows=[
+    [`DIF Index — District Categorisation`],
+    [`Lens: ${l.title}`,`Formula: ${l.formulaPlain}`],
+    [`Generated: ${new Date().toLocaleDateString('en-IN')}`],[],
+    [`Rank`,`District`,`Score`,`Pool`,`Note`],
+    ...scored.map((d,i)=>[i+1,d.name,d.score.toFixed(1),i<breakIdx?'Pool A':'Pool B',d.is_new?'Estimated data':''])
+  ];
+  dl(rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n'),
+    `DIF_Categorisation_${l.title.replace(/\s/g,'_')}.csv`,'text/csv');
+}
+
+function exportTXT(){
+  const {l,poolA,poolB,currentGap,isNatural}=window._exp;
+  const plain=document.getElementById('just-plain-text').innerText;
+  const tech=document.getElementById('just-tech-text').innerText;
+  const lines=[
+    'DIF INDEX — DISTRICT CATEGORISATION REPORT',
+    '===========================================',
+    `Lens: ${l.title}`,`Formula: ${l.formulaPlain}`,
+    `Generated: ${new Date().toLocaleDateString('en-IN')}`,
+    `Break Method: ${isNatural?'Jenks Natural Break':'Manual adjustment'}`,
+    `Break Gap: ${currentGap} points`,'',
+    `POOL A — ${poolA.length} Districts`,'─'.repeat(40),
+    ...poolA.map((d,i)=>`  ${String(i+1).padStart(2,'0')}. ${d.name.padEnd(22)} ${d.score.toFixed(1)}`),
+    '',`POOL B — ${poolB.length} Districts`,'─'.repeat(40),
+    ...poolB.map((d,i)=>`  ${String(i+1).padStart(2,'0')}. ${d.name.padEnd(22)} ${d.score.toFixed(1)}`),
+    '','PLAIN ENGLISH JUSTIFICATION','─'.repeat(40),plain,
+    '','TECHNICAL JUSTIFICATION','─'.repeat(40),tech,
+  ];
+  dl(lines.join('\n'),`DIF_Categorisation_${l.title.replace(/\s/g,'_')}.txt`,'text/plain');
+}
+
+function dl(c,f,m){
+  const b=new Blob([c],{type:m}),u=URL.createObjectURL(b),a=document.createElement('a');
+  a.href=u;a.download=f;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+
+// INIT
+renderPage1();
+</script>
+
+</body>
+</html>
