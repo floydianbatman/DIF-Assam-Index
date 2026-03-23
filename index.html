@@ -389,11 +389,11 @@ function loadData() {
   if(base && !base.endsWith('/')) base += '/';
 
   Promise.all([
-    fetch(base + 'data/cat.json').then(function(r){ return r.json(); }),
-    fetch(base + 'data/meta.json').then(function(r){ return r.json(); }),
-    fetch(base + 'data/chunk1.json').then(function(r){ return r.json(); }),
-    fetch(base + 'data/chunk2.json').then(function(r){ return r.json(); }),
-    fetch(base + 'data/chunk3.json').then(function(r){ return r.json(); })
+    fetch(base + 'cat.json').then(function(r){ return r.json(); }),
+    fetch(base + 'meta.json').then(function(r){ return r.json(); }),
+    fetch(base + 'chunk1.json').then(function(r){ return r.json(); }),
+    fetch(base + 'chunk2.json').then(function(r){ return r.json(); }),
+    fetch(base + 'chunk3.json').then(function(r){ return r.json(); })
   ]).then(function(results) {
     setLoad(60,'Processing data...');
     CAT_DATA = results[0];
