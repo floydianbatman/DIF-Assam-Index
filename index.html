@@ -392,6 +392,9 @@ var seen={};
 INDICATORS.forEach(function(i){if(!seen[i.goal]){seen[i.goal]=1;GOALS.push(i.goal);}});
 GOALS.sort(function(a,b){return parseInt(a.split(’ ‘)[1])-parseInt(b.split(’ ’)[1]);});
 setLoad(100,‘Ready’);
+document.getElementById("loading").style.display = "none";
+goTo(0);
+  
 setTimeout(function(){
 document.getElementById(‘loading’).classList.add(‘hidden’);
 document.getElementById(‘pg0’).classList.add(‘active’);
