@@ -364,13 +364,12 @@ var permResults=[], selPermIdx=null;
 
 function loadData(){
 setLoad(5,‘Loading…’);
-var base = window.location.href.replace(//[^/]*(?.*)?$/, ‘/’);
 Promise.all([
-fetch(base+‘cat.json’).then(function(r){if(!r.ok)throw new Error(‘cat.json not found’);return r.json();}),
-fetch(base+‘meta.json’).then(function(r){if(!r.ok)throw new Error(‘meta.json not found’);return r.json();}),
-fetch(base+‘chunk1.json’).then(function(r){if(!r.ok)throw new Error(‘chunk1.json not found’);return r.json();}),
-fetch(base+‘chunk2.json’).then(function(r){if(!r.ok)throw new Error(‘chunk2.json not found’);return r.json();}),
-fetch(base+‘chunk3.json’).then(function(r){if(!r.ok)throw new Error(‘chunk3.json not found’);return r.json();})
+fetch(’./cat.json’).then(function(r){if(!r.ok)throw new Error(‘cat.json: ‘+r.status+’ ‘+r.statusText);return r.json();}),
+fetch(’./meta.json’).then(function(r){if(!r.ok)throw new Error(‘meta.json: ‘+r.status+’ ‘+r.statusText);return r.json();}),
+fetch(’./chunk1.json’).then(function(r){if(!r.ok)throw new Error(‘chunk1.json: ‘+r.status+’ ‘+r.statusText);return r.json();}),
+fetch(’./chunk2.json’).then(function(r){if(!r.ok)throw new Error(‘chunk2.json: ‘+r.status+’ ‘+r.statusText);return r.json();}),
+fetch(’./chunk3.json’).then(function(r){if(!r.ok)throw new Error(’chunk3.json: ‘+r.status+’ ‘+r.statusText);return r.json();})
 ]).then(function(res){
 setLoad(70,‘Processing…’);
 CAT_DATA = res[0];
