@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DIF Index — Assam</title>
+<style>
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap");
+:root{
+  --bg:#faf8f4;--surface:#fff;--border:#e2ddd6;--border2:#c8c0b4;
+  --ink:#1a1610;--ink2:#3a3428;--muted:#8a7f72;
+  --ey:#ffce00;--ey-dk:#b89a00;--ey-lt:#fffbe6;--ey-bd:#e8d870;
+  --teal:#1e6b66;--teal-lt:#edf6f5;--teal-bd:#90ccc8;
+  --green:#1a5c2a;--green-lt:#eef7f0;--green-bd:#90c8a0;
+  --blue:#1a3a6b;--blue-lt:#eef2f8;--blue-bd:#90b0d8;
+  --red-lt:#fdf0f0;--amber:#7a4a00;--amber-lt:#fef4e4;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"EB Garamond",Georgia,serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:16px;line-height:1.6;}
+/* HEADER */
+.hdr{background:var(--ink);color:#f0ece4;padding:0 32px;display:flex;justify-content:space-between;align-items:stretch;flex-wrap:wrap;gap:0;}
+.hdr-left{padding:14px 0;display:flex;flex-direction:column;justify-content:center;}
+.hdr-eye{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:3px;color:#6a6058;text-transform:uppercase;margin-bottom:3px;}
+.hdr h1{font-size:20px;font-weight:600;}
+.hdr-sub{font-size:12px;color:#6a6058;margin-top:1px;}
+.hdr-badge{background:#2a2418;border-left:1px solid #4a4030;padding:14px 20px;text-align:center;font-family:"JetBrains Mono",monospace;display:flex;flex-direction:column;justify-content:center;}
+.hdr-badge .bn{font-size:16px;font-weight:700;color:var(--ey);display:block;}
+.hdr-badge span{font-size:10px;color:#6a6058;}
+/* EY accent stripe */
+.ey-stripe{height:4px;background:var(--ey);}
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;height:60vh;flex-direction:column;gap:16px;}
+.load-bar{width:300px;height:8px;background:#e0d8d0;border-radius:4px;overflow:hidden;}
+.load-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--ey));border-radius:4px;transition:width .3s;}
+.load-txt{font-size:13px;color:var(--muted);font-family:"JetBrains Mono",monospace;}
+/* STEP NAV */
+.stepnav{background:var(--surface);border-bottom:2px solid var(--border);padding:0 20px;display:flex;align-items:stretch;overflow-x:auto;}
+.step{display:flex;align-items:center;gap:7px;padding:11px 14px;cursor:pointer;border-bottom:3px solid transparent;font-size:12px;color:var(--muted);transition:all .2s;white-space:nowrap;margin-bottom:-2px;}
+.step.active{color:var(--ey-dk);border-bottom-color:var(--ey);font-weight:600;}
+.step.done{color:var(--teal);}
+.step.done .snum{background:var(--teal);border-color:var(--teal);color:#fff;}
+.snum{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;border:2px solid currentColor;flex-shrink:0;transition:all .2s;}
+.step.active .snum{background:var(--ey);border-color:var(--ey);color:#1a1610;}
+.sarr{color:var(--border2);padding:0 1px;display:flex;align-items:center;font-size:12px;}
+/* POOL BAR */
+.pool-bar{background:var(--ink2);color:#f0ece4;padding:7px 28px;display:none;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;border-bottom:3px solid var(--ey);}
+.pool-bar.vis{display:flex;}
+.pb-lbl{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ey);}
+.pb-val{font-weight:600;}
+.pb-chg{font-size:11px;color:var(--ey);cursor:pointer;margin-left:auto;text-decoration:underline;}
+/* PAGES */
+.page{display:none;max-width:1150px;margin:0 auto;padding:22px 24px;}
+.page.active{display:block;}
+.pg-title{font-size:22px;font-weight:700;margin-bottom:4px;}
+.pg-sub{font-size:14px;color:var(--muted);margin-bottom:20px;max-width:700px;line-height:1.6;}
+.plbl{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+/* LENS CARDS */
+.lens-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.lcard{background:var(--surface);border:2px solid var(--border);border-radius:8px;padding:16px;cursor:pointer;transition:all .2s;position:relative;}
+.lcard:hover{border-color:var(--ey);}
+.lcard.sel{border-color:var(--ey);background:var(--ey-lt);}
+.lcard.sel::after{content:"\2713";position:absolute;top:10px;right:12px;background:var(--ey);color:#1a1610;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;}
+.lcard-num{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.lcard-title{font-size:14px;font-weight:700;margin-bottom:5px;}
+.lcard-story{font-size:11px;color:var(--ink2);margin-bottom:8px;line-height:1.5;}
+.lcard-formula{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:7px 9px;font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--muted);line-height:1.7;}
+.lcard-formula b{color:var(--ey-dk);}
+.lcard-locked{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:9px;color:var(--muted);font-family:"JetBrains Mono",monospace;}
+/* DATA TABLE */
+.dtbl-wrap{border:1px solid var(--border);border-radius:8px;overflow:hidden;overflow-x:auto;margin-bottom:14px;}
+.dtbl{width:100%;border-collapse:collapse;font-size:12px;}
+.dtbl th{background:var(--ink);color:#f0ece4;padding:7px 10px;text-align:left;font-family:"JetBrains Mono",monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:400;white-space:nowrap;}
+.dtbl th.vc{background:#1a4a46;}
+.dtbl td{padding:5px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.dtbl tr:last-child td{border-bottom:none;}
+.dtbl tr:hover td{background:var(--ey-lt);}
+.dn{font-weight:600;min-width:120px;}
+.dtbl input[type=number]{width:80px;padding:3px 6px;border:1px solid var(--border);border-radius:3px;font-family:"JetBrains Mono",monospace;font-size:10px;background:#fff;color:var(--ink);}
+.dtbl input:focus{outline:none;border-color:var(--ey);background:var(--ey-lt);}
+.dtbl input.edited{border-color:var(--teal);background:var(--teal-lt);}
+.dtbl input.isnew{border-color:#e8a0a0;background:var(--red-lt);}
+/* BREAK CONTROLS */
+.break-ctrl{background:var(--surface);border:2px solid var(--ey-bd);border-radius:8px;padding:16px;margin-bottom:16px;}
+.bc-explain{background:var(--teal-lt);border:1px solid var(--teal-bd);border-radius:6px;padding:12px 16px;font-size:13px;color:var(--teal);margin-bottom:14px;line-height:1.6;}
+.bc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:12px 0 10px;}
+.bc-item label{display:block;font-family:"JetBrains Mono",monospace;font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
+.bc-item input[type=number]{width:80px;padding:6px 10px;border:2px solid var(--ey-bd);border-radius:4px;font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:600;color:var(--ey-dk);background:var(--ey-lt);text-align:center;}
+input[type=range]{width:100%;accent-color:var(--ey);}
+.bc-suggest{background:var(--teal-lt);border:1px solid var(--teal-bd);border-radius:5px;padding:7px 12px;font-size:12px;color:var(--teal);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.btn-reset{padding:3px 10px;border:1px solid var(--teal-bd);border-radius:4px;background:none;color:var(--teal);cursor:pointer;font-size:11px;font-family:"JetBrains Mono",monospace;}
+.btn-reset:hover{background:var(--teal);color:#fff;}
+/* REASONING BOX */
+.reason-box{background:var(--ey-lt);border:2px solid var(--ey-bd);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--ink2);line-height:1.7;}
+.reason-box strong{color:var(--ey-dk);}
+/* POOL CARDS */
+.pool-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.pool-card{border-radius:8px;padding:14px;border:2px solid;}
+.pA{background:var(--green-lt);border-color:var(--green-bd);}
+.pB{background:var(--blue-lt);border-color:var(--blue-bd);}
+.pc-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid;}
+.pA .pc-hdr{border-color:var(--green-bd);}
+.pB .pc-hdr{border-color:var(--blue-bd);}
+.pc-label{font-size:13px;font-weight:700;}
+.pA .pc-label{color:var(--green);}
+.pB .pc-label{color:var(--blue);}
+.pc-count{font-family:"JetBrains Mono",monospace;font-size:10px;padding:2px 7px;border-radius:10px;}
+.pA .pc-count{background:#b0dcc0;color:var(--green);}
+.pB .pc-count{background:#a8c8e0;color:var(--blue);}
+.pc-chips{display:flex;flex-wrap:wrap;gap:4px;}
+.pc-chip{padding:2px 7px;border-radius:4px;font-size:10px;border:1px solid;}
+.pA .pc-chip{background:#c8ecd4;color:var(--green);border-color:var(--green-bd);}
+.pB .pc-chip{background:#bcd4ec;color:var(--blue);border-color:var(--blue-bd);}
+/* JUSTIFICATION */
+.just-tabs{display:flex;border-bottom:1px solid var(--border);}
+.jtab{padding:8px 18px;cursor:pointer;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+.jtab.active{color:var(--ey-dk);border-bottom-color:var(--ey);font-weight:600;}
+.just-content{background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:16px 18px;margin-bottom:16px;}
+.just-box{display:none;}
+.just-box.active{display:block;}
+.just-plain{font-size:13px;color:var(--ink2);line-height:1.8;font-style:italic;}
+.just-tech{font-size:12px;color:var(--ink2);line-height:1.7;}
+.jt-sec{margin-bottom:10px;}
+.jt-lbl{font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;}
+.copy-btn{float:right;padding:3px 10px;border:1px solid var(--border2);border-radius:4px;background:none;cursor:pointer;font-size:10px;font-family:"JetBrains Mono",monospace;color:var(--muted);}
+.copy-btn:hover{background:var(--ink);color:#f0ece4;border-color:var(--ink);}
+/* STATS */
+.stat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.sc-chip{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;text-align:center;min-width:72px;}
+.sc-val{font-size:17px;font-weight:700;font-family:"JetBrains Mono",monospace;}
+.sc-lbl{font-size:9px;color:var(--muted);margin-top:2px;}
+/* RANK TABLE */
+.rank-wrap{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+.rtbl{width:100%;border-collapse:collapse;font-size:12px;}
+.rtbl th{background:var(--ink);color:#f0ece4;padding:8px 12px;text-align:left;font-family:"JetBrains Mono",monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:400;white-space:nowrap;}
+.rtbl td{padding:7px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.rtbl tr:last-child td{border-bottom:none;}
+.rtbl tr:hover td{background:var(--ey-lt);}
+.rk{font-family:"JetBrains Mono",monospace;font-weight:700;color:var(--muted);width:30px;}
+.rk.g{color:var(--ey-dk);}
+.bw{width:80px;height:4px;background:#e0d8d0;border-radius:3px;overflow:hidden;}
+.bf{height:100%;border-radius:3px;}
+.sdg-badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:9px;font-weight:700;font-family:"JetBrains Mono",monospace;}
+.sdg-leg{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+.sdg-li{display:flex;align-items:center;gap:4px;font-size:11px;}
+.sdg-sw{width:10px;height:10px;border-radius:2px;}
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+/* DRAG LIST */
+.drag-list{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px;}
+.drag-item{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--surface);cursor:grab;font-size:12px;user-select:none;transition:background .15s;}
+.drag-item:last-child{border-bottom:none;}
+.drag-item.dragging{opacity:.4;background:var(--ey-lt);}
+.drag-item.over{border-top:3px solid var(--ey);}
+.di-h{color:#c0b8ae;font-size:14px;}
+.di-r{font-family:"JetBrains Mono",monospace;font-weight:700;color:var(--muted);width:24px;font-size:11px;}
+.di-n{flex:1;font-weight:500;}
+.di-b{font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--muted);width:46px;}
+.di-c{font-family:"JetBrains Mono",monospace;font-size:10px;width:26px;text-align:center;}
+.di-btns{display:flex;gap:2px;}
+.di-btn{padding:1px 5px;font-size:11px;border:1px solid var(--border);border-radius:3px;background:var(--surface);cursor:pointer;color:var(--muted);font-family:"JetBrains Mono",monospace;}
+.di-btn:hover{background:var(--ey);color:#1a1610;border-color:var(--ey);}
+.cu{color:var(--green);}.cd{color:#c04040;}.cn{color:var(--muted);}
+/* OPTIMISATION CARDS */
+.perm-card{background:var(--surface);border:2px solid var(--border);border-radius:8px;padding:13px;margin-bottom:8px;cursor:pointer;transition:all .2s;}
+.perm-card:hover{border-color:var(--ey);}
+.perm-card.sel{border-color:var(--teal);background:var(--teal-lt);}
+.perm-card.best{border-color:var(--ey-bd);background:var(--ey-lt);}
+.pc-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;}
+.pc-m{font-size:20px;font-weight:700;font-family:"JetBrains Mono",monospace;}
+.pc-g4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:5px;}
+.pc-s{font-size:11px;color:var(--ink2);}.pc-s b{display:block;font-size:13px;color:var(--ink);}
+.mbar{height:4px;background:#e0d8d0;border-radius:3px;overflow:hidden;margin:4px 0;}
+.mfill{height:100%;border-radius:3px;}
+.two-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.det-panel{border-radius:8px;padding:11px;font-size:11px;line-height:1.7;max-height:380px;overflow-y:auto;}
+.dp-g{background:var(--green-lt);border:1px solid var(--green-bd);}
+.dp-r{background:var(--red-lt);border:1px solid #e8a0a0;}
+.dp-t{background:var(--teal-lt);border:1px solid var(--teal-bd);}
+.dp-lbl{font-family:"JetBrains Mono",monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
+/* INFO BOXES */
+.ib{border-radius:5px;padding:9px 13px;font-size:13px;margin-bottom:12px;line-height:1.5;}
+.ib-teal{background:var(--teal-lt);border:1px solid var(--teal-bd);color:var(--teal);}
+.ib-ey{background:var(--ey-lt);border:1px solid var(--ey-bd);color:var(--amber);}
+.ib-green{background:var(--green-lt);border:1px solid var(--green-bd);color:var(--green);}
+.ib-amber{background:var(--amber-lt);border:1px solid #e8c870;color:var(--amber);}
+/* PROGRESS */
+.prog-wrap{background:#e0d8d0;border-radius:4px;height:8px;overflow:hidden;margin:8px 0;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--ey));border-radius:4px;transition:width .3s;}
+/* BUTTONS */
+.btn{padding:9px 20px;border-radius:5px;cursor:pointer;font-family:"EB Garamond",serif;font-size:14px;font-weight:600;border:none;transition:all .2s;}
+.btn-dark{background:var(--ink);color:#f0ece4;}.btn-dark:hover{background:#2a2418;}
+.btn-dark:disabled{background:#c0b8ae;cursor:not-allowed;}
+.btn-ghost{background:none;border:1px solid var(--border2);color:var(--ink2);}.btn-ghost:hover{border-color:var(--ink);}
+.btn-dl{background:var(--green);color:#fff;}.btn-dl:hover{background:#124a1e;}
+.btn-ey{background:var(--ey);color:#1a1610;}.btn-ey:hover{background:var(--ey-dk);color:#fff;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px;}
+/* FOOTER */
+.site-footer{background:var(--ink);color:#6a6058;text-align:center;padding:12px 24px;font-size:11px;font-family:"JetBrains Mono",monospace;letter-spacing:1px;border-top:3px solid var(--ey);margin-top:40px;}
+.site-footer span{color:var(--ey);}
+.hidden{display:none!important;}
+/* SECTION DIVIDER */
+.sec-div{height:2px;background:linear-gradient(90deg,var(--ey),transparent);margin:18px 0;}
+/* SCORE SOURCE TAG */
+.src-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-family:"JetBrains Mono",monospace;background:var(--ey-lt);color:var(--ey-dk);border:1px solid var(--ey-bd);margin-left:4px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-eye">Government of Assam &middot; District Indicator Framework Index</div>
+    <h1>DIF Index &mdash; Categorisation &amp; Indicator Engine</h1>
+    <div class="hdr-sub">33 Rankable Districts &middot; 84 Indicators &middot; 15 Goals &middot; Statistical Handbook Assam 2025</div>
+  </div>
+  <div class="hdr-badge"><span class="bn">DIF 2025</span><span>Assam</span></div>
+</div>
+<div class="ey-stripe"></div>
+
+<div class="pool-bar" id="pool-bar">
+  <span class="pb-lbl">Locked Pool</span>
+  <span class="pb-val" id="pb-val"></span>
+  <span class="pb-chg" onclick="goTo(0)">&larr; Change pool</span>
+</div>
+
+<div class="stepnav">
+  <div class="step active" id="sn0" onclick="goTo(0)"><span class="snum">1</span>Choose Lens</div>
+  <span class="sarr">&rsaquo;</span>
+  <div class="step" id="sn1" onclick="goTo(1)"><span class="snum">2</span>Review Data</div>
+  <span class="sarr">&rsaquo;</span>
+  <div class="step" id="sn2" onclick="goTo(2)"><span class="snum">3</span>Set Break &amp; Pools</div>
+  <span class="sarr">&rsaquo;</span>
+  <div class="step" id="sn3" onclick="goTo(3)"><span class="snum">4</span>Baseline Ranking</div>
+  <span class="sarr">&rsaquo;</span>
+  <div class="step" id="sn4" onclick="goTo(4)"><span class="snum">5</span>Set Target</div>
+  <span class="sarr">&rsaquo;</span>
+  <div class="step" id="sn5" onclick="goTo(5)"><span class="snum">6</span>Optimise</div>
+</div>
+
+<!-- LOADING -->
+
+<div class="loading" id="loading">
+  <div style="font-size:18px;font-weight:600;color:var(--ink)">Loading DIF Data</div>
+  <div class="load-bar"><div class="load-fill" id="load-fill" style="width:0%"></div></div>
+  <div class="load-txt" id="load-txt">Initialising...</div>
+</div>
+
+<!-- PAGE 0: CHOOSE LENS -->
+
+<div class="page" id="pg0">
+  <div class="pg-title">Choose a Categorisation Lens</div>
+  <p class="pg-sub">Select how to divide the 35 districts into two pools. Each lens uses a different set of structural indicators from the Statistical Handbook Assam 2025. Lens formulas and weights are locked for methodological consistency and auditability.</p>
+  <div class="ib ib-teal" style="font-size:12px;margin-bottom:16px;">
+    <strong>Weighting Structure (Locked):</strong> All lenses use a three-tier system &mdash; Primary component (50%) &middot; Secondary component (30%) &middot; Tertiary component (20%). Only structural indicators are used. No outcome or performance indicators.
+  </div>
+  <div class="lens-grid" id="lens-grid"></div>
+  <button class="btn btn-dark" id="btn-p1" onclick="goTo(1)" disabled>Review Data &rarr;</button>
+</div>
+
+<!-- PAGE 1: REVIEW DATA -->
+
+<div class="page" id="pg1">
+  <div class="pg-title">Review &amp; Edit District Data</div>
+  <p class="pg-sub">Raw data from Statistical Handbook Assam 2025. You may correct individual data values. Lens formulas and weights are fixed. Bajali and Tamulpur have no indicator data and are excluded from ranking steps.</p>
+  <div class="ib ib-teal" id="p1-bar"></div>
+  <div class="ib" style="background:#fff8e1;border:1px solid var(--ey-bd);color:var(--amber);font-size:12px;margin-bottom:12px;">
+    &#128274; Lens formula and weights are locked. Edit raw data values only &mdash; updated scores recalculate automatically.
+  </div>
+  <div class="dtbl-wrap"><table class="dtbl"><thead id="dt-head"></thead><tbody id="dt-body"></tbody></table></div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo(0)">&larr; Back</button>
+    <button class="btn btn-dark" onclick="goTo(2)">Set Break Point &rarr;</button>
+  </div>
+</div>
+
+<!-- PAGE 2: SET BREAK -->
+
+<div class="page" id="pg2">
+  <div class="pg-title">Set Break Point &amp; Confirm Pools</div>
+  <p class="pg-sub">Districts are ranked by their Development Character Score. The break divides them into Pool A (higher character) and Pool B (lower character). The system suggests the most defensible break based on Jenks Natural Breaks.</p>
+  <div class="bc-explain">
+    <strong>How to use:</strong> Districts are ranked by score from highest to lowest. You draw a line in this ranking &mdash; districts above the line go to Pool A, below go to Pool B.
+    The tool suggests the best natural break (the biggest gap in scores) but you can adjust freely using the slider, by typing a score, or by clicking any district row directly.
+  </div>
+  <div class="break-ctrl">
+    <div class="bc-grid">
+      <div class="bc-item">
+        <label>Drag slider to move break</label>
+        <input type="range" id="br-slider" min="1" max="32" value="1" oninput="setBreak('slider',this.value)">
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;"><span>Pool A = 1</span><span>Pool A = all</span></div>
+      </div>
+      <div class="bc-item">
+        <label>Type a score cut-off</label>
+        <input type="number" id="br-score" step="0.1" oninput="setBreak('score',this.value)">
+        <div style="font-size:9px;color:var(--muted);margin-top:2px;font-family:'JetBrains Mono',monospace;">Districts above this &rarr; Pool A</div>
+      </div>
+      <div class="bc-item">
+        <label>Or click a district row below</label>
+        <div style="background:var(--ey-lt);border:1px solid var(--ey-bd);border-radius:4px;padding:7px 9px;font-size:11px;color:var(--amber);line-height:1.5;">Tap any row to set the break just above that district.</div>
+      </div>
+    </div>
+    <div class="bc-suggest" id="bc-sug"><span id="bc-sug-txt"></span><button class="btn-reset" onclick="resetBreak()">&#8635; Reset to suggested</button></div>
+  </div>
+
+  <!-- Structural reasoning panel -->
+
+  <div class="reason-box" id="break-reason">
+    <strong>&#128269; System Reasoning:</strong> <span id="reason-txt">Select a lens and break point to see the structural justification.</span>
+  </div>
+
+  <div class="plbl">33 Rankable Districts &mdash; click any row to set break</div>
+  <div class="rank-wrap"><table class="rtbl" id="break-tbl"></table></div>
+  <div class="pool-grid" id="pool-preview"></div>
+  <div class="plbl" style="margin-bottom:0">Justification</div>
+  <div class="just-tabs">
+    <div class="jtab active" onclick="showJust('plain')">Plain English</div>
+    <div class="jtab" onclick="showJust('tech')">Technical</div>
+  </div>
+  <div class="just-content">
+    <div class="just-box active" id="just-plain"><button class="copy-btn" onclick="copyJ('plain')">Copy</button><div class="just-plain" id="jp-txt"></div></div>
+    <div class="just-box" id="just-tech"><button class="copy-btn" onclick="copyJ('tech')">Copy</button><div class="just-tech" id="jt-txt"></div></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo(1)">&larr; Back</button>
+    <button class="btn btn-dl" onclick="dlCat()">&#8595; Download Categorisation (CSV)</button>
+    <button class="btn btn-ey" onclick="lockAndGo()">&#128274; Lock Pool &amp; Proceed &rarr;</button>
+  </div>
+</div>
+
+<!-- PAGE 3: BASELINE RANKING -->
+
+<div class="page" id="pg3">
+  <div class="pg-title">Baseline Ranking</div>
+  <p class="pg-sub">Both pools ranked by the DIF composite score. The composite score is taken directly from the verified DIF framework (DIF_indexing_draft1_13.02.2026.xlsm) and used as the single source of truth.</p>
+  <div class="ib ib-teal" style="font-size:12px;margin-bottom:12px;">
+    <span class="src-tag">SOURCE</span> Composite scores are pre-computed from the DIF Goal Sheet. They are not re-normalised here. Rankings reflect true peer-group standing within each pool.
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+    <button style="padding:7px 14px;cursor:pointer;font-size:13px;font-family:'EB Garamond',serif;border:none;border-radius:5px 0 0 5px;transition:all .2s;" id="ss-e" onclick="setST('existing')">Existing DIF Final Score</button>
+    <button style="padding:7px 14px;cursor:pointer;font-size:13px;font-family:'EB Garamond',serif;border:none;border-radius:0 5px 5px 0;transition:all .2s;" id="ss-f" onclick="setST('fresh')">Fresh Equal-Weight (84 indicators)</button>
+  </div>
+  <div class="sdg-leg">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-right:4px;">SDG Scale:</span>
+    <div class="sdg-li"><div class="sdg-sw" style="background:#DD1E47"></div>Aspirant (0&ndash;49)</div>
+    <div class="sdg-li"><div class="sdg-sw" style="background:#FFC40C"></div>Performer (50&ndash;64)</div>
+    <div class="sdg-li"><div class="sdg-sw" style="background:#00A084"></div>Front Runner (65&ndash;99)</div>
+    <div class="sdg-li"><div class="sdg-sw" style="background:#00AEEF"></div>Achiever (100)</div>
+  </div>
+  <div class="two-col" id="both-pools"></div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo(2)">&larr; Back</button>
+    <button class="btn btn-dl" onclick="dlBoth()">&#8595; Download Both Pools (CSV)</button>
+    <button class="btn btn-dark" onclick="confirmBaseline()">Set Target Ranking &rarr;</button>
+  </div>
+</div>
+
+<!-- PAGE 4: TARGET RANKING -->
+
+<div class="page" id="pg4">
+  <div class="pg-title">Set Target Ranking</div>
+  <p class="pg-sub">Drag districts within each pool into your desired final order, or use the &#9650;&#9660; arrow buttons for fine adjustments. The baseline rank is shown for reference.</p>
+  <div class="two-col">
+    <div>
+      <div class="plbl" style="color:var(--green)">Pool A &mdash; drag or use arrows</div>
+      <div class="drag-list" id="drag-A"></div>
+    </div>
+    <div>
+      <div class="plbl" style="color:var(--blue)">Pool B &mdash; drag or use arrows</div>
+      <div class="drag-list" id="drag-B"></div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo(3)">&larr; Back</button>
+    <button class="btn btn-ghost" onclick="resetTargets()">&#8635; Reset Both</button>
+    <button class="btn btn-dark" onclick="goTo(5);runOpt()">Run Optimiser &rarr;</button>
+  </div>
+</div>
+
+<!-- PAGE 5: OPTIMISE -->
+
+<div class="page" id="pg5">
+  <div class="pg-title">Indicator Optimisation</div>
+  <p class="pg-sub">Removes individual indicators one at a time to reach 100% match. Will not go below 50 indicators. Each Goal keeps at least one indicator throughout. Goal 7 inputs verified from source data.</p>
+  <div id="opt-run" class="hidden">
+    <div class="ib ib-ey">Running optimisation &mdash; trying to reach 100% match...</div>
+    <div class="prog-wrap"><div class="prog-fill" id="opt-prog" style="width:0%"></div></div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="opt-lbl"></div>
+  </div>
+  <div id="opt-fbk" class="hidden"></div>
+  <div id="opt-res" class="hidden">
+    <div class="stat-row" id="opt-stats"></div>
+    <div class="plbl">Top 10 Results &mdash; click to select</div>
+    <div id="perm-cards"></div>
+    <div id="acc-detail" class="hidden">
+      <div class="ib ib-green" id="acc-sum"></div>
+      <div class="two-panels" style="margin-bottom:16px;">
+        <div class="det-panel dp-g"><div class="dp-lbl" style="color:var(--green)" id="kept-lbl">Kept</div><div id="kept-list"></div></div>
+        <div class="det-panel dp-r"><div class="dp-lbl" style="color:#c04040" id="rem-lbl">Removed</div><div id="rem-list"></div></div>
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="plbl" style="color:var(--green)">Pool A &mdash; Target vs Result</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+            <div style="background:var(--green-lt);padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--green);">Your Target</div>
+            <div style="background:var(--green-lt);padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--teal);border-left:2px solid var(--green-bd);">Result</div>
+            <div id="cmp-tgt-A" style="padding:8px 10px;font-size:11px;line-height:1.8;border-top:1px solid var(--border);border-right:1px solid var(--border);"></div>
+            <div id="cmp-res-A" style="padding:8px 10px;font-size:11px;line-height:1.8;border-top:1px solid var(--border);border-left:2px solid var(--green-bd);"></div>
+          </div>
+        </div>
+        <div>
+          <div class="plbl" style="color:var(--blue)">Pool B &mdash; Target vs Result</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+            <div style="background:var(--blue-lt);padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--blue);">Your Target</div>
+            <div style="background:var(--blue-lt);padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--teal);border-left:2px solid var(--blue-bd);">Result</div>
+            <div id="cmp-tgt-B" style="padding:8px 10px;font-size:11px;line-height:1.8;border-top:1px solid var(--border);border-right:1px solid var(--border);"></div>
+            <div id="cmp-res-B" style="padding:8px 10px;font-size:11px;line-height:1.8;border-top:1px solid var(--border);border-left:2px solid var(--blue-bd);"></div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goTo(4)">&larr; Adjust Target</button>
+        <button class="btn btn-dl" onclick="dlExcel()">&#8595; Download Optimised Framework (CSV)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+
+<div class="site-footer">&copy; <span>Ernst &amp; Young LLP</span> &mdash; Government of Assam &middot; District Indicator Framework &middot; 2025</div>
+
+<script>
+// ─── GLOBAL STATE ────────────────────────────────────────────────────────────
+var CAT_DATA=null, IND_DATA=null;
+var GOALS=[], INDICATORS=[], DISTRICTS={}, EXISTING={}, FRESH={}, CAT_DISTRICTS=[];
+var selLensId=null, breakIdx=1, naturalBreakIdx=1, naturalGap=0, scoredAll=[];
+var lockedPoolA=[], lockedPoolB=[], poolLocked=false;
+var scoreType='existing';
+var baseRankedA=[], baseRankedB=[], targetRankedA=[], targetRankedB=[];
+var permResults=[], selPermIdx=null;
+
+// ─── CORRECTED GOAL 7 DATA (from DIF_indexing_draft1_13.02.2026.xlsm) ───────
+// These are the NORMALISED indicator values, not raw percentages
+var GOAL7_CORRECTED = {
+  "Baksa":{"7.1.1 : Percentage of households electrified":99.5744,"7.1.AA1: Percentage of villages electrified":100.0,"7.1.2: Percentage of household using clean cooking fuel":0.0},
+  "Barpeta":{"7.1.1 : Percentage of households electrified":72.8969,"7.1.AA1: Percentage of villages electrified":90.4103,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Biswanath":{"7.1.1 : Percentage of households electrified":52.5572,"7.1.AA1: Percentage of villages electrified":85.04,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Bongaigaon":{"7.1.1 : Percentage of households electrified":82.1528,"7.1.AA1: Percentage of villages electrified":100.0,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Cachar":{"7.1.1 : Percentage of households electrified":64.2494,"7.1.AA1: Percentage of villages electrified":89.2115,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Charaideo":{"7.1.1 : Percentage of households electrified":77.9005,"7.1.AA1: Percentage of villages electrified":83.9714,"7.1.2: Percentage of household using clean cooking fuel":90.8001},
+  "Chirang":{"7.1.1 : Percentage of households electrified":89.1831,"7.1.AA1: Percentage of villages electrified":94.4783,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Darrang":{"7.1.1 : Percentage of households electrified":95.8327,"7.1.AA1: Percentage of villages electrified":0.0,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Dhemaji":{"7.1.1 : Percentage of households electrified":74.4363,"7.1.AA1: Percentage of villages electrified":68.1008,"7.1.2: Percentage of household using clean cooking fuel":76.0956},
+  "Dhubri":{"7.1.1 : Percentage of households electrified":72.7043,"7.1.AA1: Percentage of villages electrified":87.1527,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Dibrugarh":{"7.1.1 : Percentage of households electrified":69.4414,"7.1.AA1: Percentage of villages electrified":95.8383,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Dima Hasao":{"7.1.1 : Percentage of households electrified":49.3056,"7.1.AA1: Percentage of villages electrified":71.7482,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Goalpara":{"7.1.1 : Percentage of households electrified":56.4839,"7.1.AA1: Percentage of villages electrified":89.8492,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Golaghat":{"7.1.1 : Percentage of households electrified":94.2976,"7.1.AA1: Percentage of villages electrified":97.5067,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Hailakandi":{"7.1.1 : Percentage of households electrified":65.356,"7.1.AA1: Percentage of villages electrified":83.0514,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Hojai":{"7.1.1 : Percentage of households electrified":95.6334,"7.1.AA1: Percentage of villages electrified":80.1416,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Jorhat":{"7.1.1 : Percentage of households electrified":78.3369,"7.1.AA1: Percentage of villages electrified":55.9136,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Kamrup":{"7.1.1 : Percentage of households electrified":59.0661,"7.1.AA1: Percentage of villages electrified":92.1208,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Kamrup Metro":{"7.1.1 : Percentage of households electrified":75.4122,"7.1.AA1: Percentage of villages electrified":74.0278,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Karbi Anglong":{"7.1.1 : Percentage of households electrified":43.2825,"7.1.AA1: Percentage of villages electrified":66.3976,"7.1.2: Percentage of household using clean cooking fuel":86.2528},
+  "Sribhumi":{"7.1.1 : Percentage of households electrified":71.3442,"7.1.AA1: Percentage of villages electrified":94.0064,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Kokrajhar":{"7.1.1 : Percentage of households electrified":80.0109,"7.1.AA1: Percentage of villages electrified":97.3736,"7.1.2: Percentage of household using clean cooking fuel":97.6628},
+  "Lakhimpur":{"7.1.1 : Percentage of households electrified":88.055,"7.1.AA1: Percentage of villages electrified":57.3564,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Majuli":{"7.1.1 : Percentage of households electrified":93.277,"7.1.AA1: Percentage of villages electrified":100.0,"7.1.2: Percentage of household using clean cooking fuel":67.4682},
+  "Morigaon":{"7.1.1 : Percentage of households electrified":91.6607,"7.1.AA1: Percentage of villages electrified":95.5617,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Nagaon":{"7.1.1 : Percentage of households electrified":87.849,"7.1.AA1: Percentage of villages electrified":83.4416,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Nalbari":{"7.1.1 : Percentage of households electrified":89.0313,"7.1.AA1: Percentage of villages electrified":100.0,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Sivasagar":{"7.1.1 : Percentage of households electrified":96.8878,"7.1.AA1: Percentage of villages electrified":89.3143,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Sonitpur":{"7.1.1 : Percentage of households electrified":62.0908,"7.1.AA1: Percentage of villages electrified":82.5622,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "South Salmara":{"7.1.1 : Percentage of households electrified":52.9014,"7.1.AA1: Percentage of villages electrified":93.5665,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Tinsukia":{"7.1.1 : Percentage of households electrified":96.7426,"7.1.AA1: Percentage of villages electrified":100.0,"7.1.2: Percentage of household using clean cooking fuel":100.0},
+  "Udalguri":{"7.1.1 : Percentage of households electrified":92.1427,"7.1.AA1: Percentage of villages electrified":100.0,"7.1.2: Percentage of household using clean cooking fuel":95.9129},
+  "West Karbi Anglong":{"7.1.1 : Percentage of households electrified":0.0,"7.1.AA1: Percentage of villages electrified":68.78,"7.1.2: Percentage of household using clean cooking fuel":80.1044}
+};
+
+// ─── AUTHORITATIVE COMPOSITE SCORES (from DIF_indexing_draft1_13.02.2026.xlsm Goal Sheet) ──
+var DIF_COMPOSITE = {
+  "Baksa":66.672,"Barpeta":67.9554,"Biswanath":61.6221,"Bongaigaon":73.1371,
+  "Cachar":69.5733,"Charaideo":65.1002,"Chirang":65.6856,"Darrang":67.1094,
+  "Dhemaji":69.5639,"Dhubri":66.4133,"Dibrugarh":70.6194,"Dima Hasao":55.9002,
+  "Goalpara":70.7982,"Golaghat":69.8933,"Hailakandi":70.0802,"Hojai":72.4528,
+  "Jorhat":68.7998,"Kamrup":71.2059,"Kamrup Metro":67.1455,"Karbi Anglong":63.4021,
+  "Sribhumi":68.6877,"Kokrajhar":70.4479,"Lakhimpur":66.6653,"Majuli":74.5281,
+  "Morigaon":70.994,"Nagaon":69.6453,"Nalbari":68.2638,"Sivasagar":71.1609,
+  "Sonitpur":66.2924,"South Salmara":58.5186,"Tinsukia":72.1111,
+  "Udalguri":65.4713,"West Karbi Anglong":51.836
+};
+
+// ─── SDG HELPERS ─────────────────────────────────────────────────────────────
+function sdgColor(s){return s===100?'#00AEEF':s>=65?'#00A084':s>=50?'#FFC40C':'#DD1E47';}
+function sdgLabel(s){return s===100?'Achiever':s>=65?'Front Runner':s>=50?'Performer':'Aspirant';}
+function sdgTC(s){return(s>=50&&s<65)?'#5a3a00':'#fff';}
+
+// ─── LENS DEFINITIONS (50-30-20 locked weights) ──────────────────────────────
+var LENSES = [
+  {
+    id:0, title:'Urban Character',
+    story:'Districts with vastly different urbanisation levels cannot be meaningfully compared on the same scale. This lens separates districts by their urban and density character.',
+    formula:'Urban% <b>×0.50</b> + Density <b>×0.30</b> + Towns <b>×0.20</b>',
+    fplain:'Urban % (50%) + Population Density (30%) + No. of Towns (20%)',
+    weights:'50% Urban %, 30% Density, 20% Towns',
+    vars:[
+      {k:'urban_pct',lbl:'Urban %',src:'Statistical Handbook 2025 Table 1.03',unit:'%',w:0.50},
+      {k:'density',lbl:'Density/km²',src:'Statistical Handbook 2025 Table 1.02',unit:'/km²',w:0.30},
+      {k:'towns',lbl:'Towns',src:'Statistical Handbook 2025 Table 1.02',unit:'',w:0.20}
+    ],
+    score:function(d,N){return N.urban_pct(d.urban_pct)*0.50+N.density(d.density)*0.30+N.towns(d.towns)*0.20;},
+    plainLogic:'Districts with more towns, higher population density, and a larger urban population share were placed in Pool A. Predominantly rural districts with low density were placed in Pool B.',
+    reasoning:function(scoredArr,bi){
+      var pA=scoredArr.slice(0,bi), pB=scoredArr.slice(bi);
+      var topU=pA.length?pA[0].name:'—', botU=pB.length?pB[pB.length-1].name:'—';
+      return 'Pool A districts exhibit significantly higher urbanisation, density, and town count &mdash; structural features that create fundamentally different delivery environments. <strong>'+topU+'</strong> leads Pool A. Pool B districts, led by <strong>'+botU+'</strong>, are predominantly rural and require different baseline comparisons.';
+    }
+  },
+  {
+    id:1, title:'Geographic & Ecological',
+    story:'Hill, riverine, island and floodplain districts face physical barriers that fundamentally differ from compact plains districts.',
+    formula:'Plains Score <b>×0.50</b> + Density <b>×0.30</b> + Inverse Area <b>×0.20</b>',
+    fplain:'Plains Character (50%) + Population Density (30%) + Inverse of Area (20%)',
+    weights:'50% Plains Score, 30% Density, 20% Inverse Area',
+    vars:[
+      {k:'plains',lbl:'Plains Score',src:'Administrative records / Handbook 2025',unit:'/100',w:0.50},
+      {k:'density',lbl:'Density/km²',src:'Statistical Handbook 2025 Table 1.02',unit:'/km²',w:0.30},
+      {k:'area',lbl:'Area km²',src:'Statistical Handbook 2025 Table 1.02',unit:'km²',w:0.20,inv:true}
+    ],
+    score:function(d,N){return N.plains(d.plains)*0.50+N.density(d.density)*0.30+N.area_inv(1/d.area*10000)*0.20;},
+    plainLogic:'Compact, dense plains districts with higher accessibility were placed in Pool A. Hill, jungle, island and flood-prone districts with lower plains character were placed in Pool B.',
+    reasoning:function(scoredArr,bi){
+      var pB=scoredArr.slice(bi);
+      var hilly=pB.filter(function(d){return d.name==='Dima Hasao'||d.name==='Karbi Anglong'||d.name==='West Karbi Anglong'||d.name==='Majuli';}).map(function(d){return d.name;});
+      return 'Pool B contains districts with recognised geographic challenges: '+(hilly.length?hilly.join(', '):'hill and island districts')+'. These face structural barriers in terrain, accessibility and seasonal flooding that cannot be controlled for without pool separation. The plains-density score reveals a clear discontinuity at this break.';
+    }
+  },
+  {
+    id:2, title:'Administrative Maturity',
+    story:'Older, well-established districts have deeper institutional infrastructure — more towns, larger administrative networks, and higher service density.',
+    formula:'Towns <b>×0.50</b> + CD Blocks <b>×0.30</b> + Density <b>×0.20</b>',
+    fplain:'No. of Towns (50%) + CD Blocks (30%) + Population Density (20%)',
+    weights:'50% Towns, 30% CD Blocks, 20% Density',
+    vars:[
+      {k:'towns',lbl:'Towns',src:'Statistical Handbook 2025 Table 1.02',unit:'',w:0.50},
+      {k:'blocks',lbl:'CD Blocks',src:'Statistical Handbook 2025 Table 1.02',unit:'',w:0.30},
+      {k:'density',lbl:'Density/km²',src:'Statistical Handbook 2025 Table 1.02',unit:'/km²',w:0.20}
+    ],
+    score:function(d,N){return N.towns(d.towns)*0.50+N.blocks(d.blocks)*0.30+N.density(d.density)*0.20;},
+    plainLogic:'Districts with more towns, more CD blocks, and higher density were placed in Pool A, reflecting deeper administrative infrastructure. Newly created or sparsely administered districts were placed in Pool B.',
+    reasoning:function(scoredArr,bi){
+      var pA=scoredArr.slice(0,bi);
+      var newDistricts=['Biswanath','Charaideo','Majuli','South Salmara','West Karbi Anglong'];
+      var inB=scoredArr.slice(bi).filter(function(d){return newDistricts.indexOf(d.name)>=0;}).map(function(d){return d.name;});
+      return 'Administrative maturity — measured by town count, block count and density — shows a clear divide at this break point. '+(inB.length?'Newer districts ('+inB.join(', ')+') with fewer towns and blocks fall in Pool B, which is methodologically sound.':'Higher-maturity districts are in Pool A with deeper service infrastructure.');
+    }
+  },
+  {
+    id:3, title:'Population Scale',
+    story:'Delivery capacity and resource allocation scale with population size. Districts serving very different population sizes should be assessed separately.',
+    formula:'Projected Pop. <b>×0.50</b> + Density <b>×0.30</b> + Urban% <b>×0.20</b>',
+    fplain:'Projected Population (50%) + Density (30%) + Urban % (20%)',
+    weights:'50% Population, 30% Density, 20% Urban %',
+    vars:[
+      {k:'pop',lbl:'Population',src:'Statistical Handbook Assam 2025 (projected)',unit:'',w:0.50},
+      {k:'density',lbl:'Density/km²',src:'Statistical Handbook 2025 Table 1.02',unit:'/km²',w:0.30},
+      {k:'urban_pct',lbl:'Urban %',src:'Statistical Handbook 2025 Table 1.03',unit:'%',w:0.20}
+    ],
+    score:function(d,N){return N.pop(d.pop)*0.50+N.density(d.density)*0.30+N.urban_pct(d.urban_pct)*0.20;},
+    plainLogic:'Larger, denser districts with higher urbanisation were placed in Pool A. Smaller, recently created districts with lower populations were placed in Pool B. Population data is from the Statistical Handbook Assam 2025 (projected figures).',
+    reasoning:function(scoredArr,bi){
+      var pA=scoredArr.slice(0,bi), pB=scoredArr.slice(bi);
+      var avgA=pA.reduce(function(s,d){var cd=CAT_DISTRICTS.find(function(x){return x.name===d.name;});return s+(cd?cd.pop:0);},0)/(pA.length||1);
+      var avgB=pB.reduce(function(s,d){var cd=CAT_DISTRICTS.find(function(x){return x.name===d.name;});return s+(cd?cd.pop:0);},0)/(pB.length||1);
+      return 'Pool A average projected population: <strong>'+(Math.round(avgA/1000)/1000).toFixed(2)+' million</strong>. Pool B average: <strong>'+(Math.round(avgB/1000)/1000).toFixed(2)+' million</strong>. This scale difference justifies separate peer pools &mdash; delivery capacity, infrastructure requirements and benchmark expectations differ structurally at this population divide.';
+    }
+  },
+  {
+    id:4, title:'Demographic / Social Composition',
+    story:'Constitutional recognition of Scheduled Tribe areas acknowledges their structural distinctiveness. Social composition shapes the development baseline.',
+    formula:'(100−ST%) <b>×0.50</b> + Urban% <b>×0.30</b> + Literacy <b>×0.20</b>',
+    fplain:'Inverse of ST % (50%) + Urban % (30%) + Literacy Rate (20%)',
+    weights:'50% Inverse ST %, 30% Urban %, 20% Literacy',
+    vars:[
+      {k:'st_pct',lbl:'ST %',src:'Statistical Handbook 2025 Table 1.04',unit:'%',w:0.50,inv:true},
+      {k:'urban_pct',lbl:'Urban %',src:'Statistical Handbook 2025 Table 1.03',unit:'%',w:0.30},
+      {k:'literacy',lbl:'Literacy %',src:'Statistical Handbook 2025 Table 1.05',unit:'%',w:0.20}
+    ],
+    score:function(d,N){return N.inv_st(100-d.st_pct)*0.50+N.urban_pct(d.urban_pct)*0.30+N.literacy(d.literacy)*0.20;},
+    plainLogic:'Districts with lower tribal population share and higher urbanisation and literacy were placed in Pool A. Districts with high ST concentration, including 6th Schedule and BTAD areas, were placed in Pool B.',
+    reasoning:function(scoredArr,bi){
+      var pB=scoredArr.slice(bi);
+      var stHigh=pB.filter(function(d){var cd=CAT_DISTRICTS.find(function(x){return x.name===d.name;});return cd&&cd.st_pct>30;}).map(function(d){return d.name;});
+      return 'Pool B contains districts with high Scheduled Tribe population: '+(stHigh.length?stHigh.join(', '):'high ST districts')+'. These districts operate under constitutionally distinct frameworks (6th Schedule, BTAD, Autonomous Councils) and face different structural baselines &mdash; pool separation enables fair within-group assessment.';
+    }
+  },
+  {
+    id:5, title:'Economic Structure',
+    story:'Urban-industrial and agrarian-rural economies generate different development baselines. Literacy, urbanisation, and density together proxy economic structural character.',
+    formula:'Urban% <b>×0.50</b> + Literacy <b>×0.30</b> + Density <b>×0.20</b>',
+    fplain:'Urban % (50%) + Literacy Rate (30%) + Density (20%)',
+    weights:'50% Urban %, 30% Literacy, 20% Density',
+    vars:[
+      {k:'urban_pct',lbl:'Urban %',src:'Statistical Handbook 2025 Table 1.03',unit:'%',w:0.50},
+      {k:'literacy',lbl:'Literacy %',src:'Statistical Handbook 2025 Table 1.05',unit:'%',w:0.30},
+      {k:'density',lbl:'Density/km²',src:'Statistical Handbook 2025 Table 1.02',unit:'/km²',w:0.20}
+    ],
+    score:function(d,N){return N.urban_pct(d.urban_pct)*0.50+N.literacy(d.literacy)*0.30+N.density(d.density)*0.20;},
+    plainLogic:'Districts with higher literacy, urbanisation, and density — proxies for a more diversified economic base — were placed in Pool A. Districts with predominantly agrarian and subsistence economies were placed in Pool B.',
+    reasoning:function(scoredArr,bi){
+      var pA=scoredArr.slice(0,bi);
+      var top3=pA.slice(0,3).map(function(d){return d.name;});
+      return 'Economic structure — proxied by urban share, literacy and density — shows a clear grouping. Top Pool A districts (<strong>'+top3.join(', ')+'</strong>) have a qualitatively different economic base. This separation enables peer comparison within similar structural economic environments, rather than penalising rural districts against urban benchmarks.';
+    }
+  }
+];
+
+// ─── NORMALISATION ──────────────────────────────────────────────────────────
+function buildNorm(){
+  function mm(key){
+    var vals=CAT_DISTRICTS.map(function(d){return d[key];});
+    var mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals);
+    return function(x){return mx===mn?50:(x-mn)/(mx-mn)*100;};
+  }
+  var ia=CAT_DISTRICTS.map(function(d){return 1/d.area*10000;});
+  var mn_a=Math.min.apply(null,ia), mx_a=Math.max.apply(null,ia);
+  var is=CAT_DISTRICTS.map(function(d){return 100-d.st_pct;});
+  var mn_s=Math.min.apply(null,is), mx_s=Math.max.apply(null,is);
+  return {
+    urban_pct:mm('urban_pct'), density:mm('density'), towns:mm('towns'),
+    pop:mm('pop'), literacy:mm('literacy'), st_pct:mm('st_pct'),
+    blocks:mm('blocks'), plains:mm('plains'),
+    area_inv:function(x){return mx_a===mn_a?50:(x-mn_a)/(mx_a-mn_a)*100;},
+    inv_st:function(x){return mx_s===mn_s?50:(x-mn_s)/(mx_s-mn_s)*100;}
+  };
+}
+
+function jenks(arr){
+  var maxG=0, ci=1;
+  for(var i=0;i<arr.length-1;i++){
+    var g=arr[i].score-arr[i+1].score;
+    if(g>maxG){maxG=g;ci=i+1;}
+  }
+  return {ci:ci,gap:maxG};
+}
+
+function catScores(lens){
+  var N=buildNorm();
+  var rankable=CAT_DISTRICTS.filter(function(d){return d.has_ind_data;});
+  return rankable.map(function(d){
+    return {name:d.name, score:Math.round(lens.score(d,N)*10)/10};
+  }).sort(function(a,b){return b.score-a.score;});
+}
+
+// ─── DATA LOADING ────────────────────────────────────────────────────────────
+function loadData(){
+  setLoad(5,'Loading…');
+  Promise.all([
+    fetch('./cat.json').then(function(r){if(!r.ok)throw new Error('cat.json: '+r.status);return r.json();}),
+    fetch('./meta.json').then(function(r){if(!r.ok)throw new Error('meta.json: '+r.status);return r.json();}),
+    fetch('./chunk1.json').then(function(r){if(!r.ok)throw new Error('chunk1.json: '+r.status);return r.json();}),
+    fetch('./chunk2.json').then(function(r){if(!r.ok)throw new Error('chunk2.json: '+r.status);return r.json();}),
+    fetch('./chunk3.json').then(function(r){if(!r.ok)throw new Error('chunk3.json: '+r.status);return r.json();})
+  ]).then(function(res){
+    setLoad(70,'Processing…');
+    CAT_DATA=res[0];
+    var meta=res[1], c1=res[2], c2=res[3], c3=res[4];
+    CAT_DATA.districts.forEach(function(d){
+      if(!d.urban_pct) d.urban_pct=Math.round(d.urban_pop/d.pop*10000)/100;
+    });
+    CAT_DISTRICTS=CAT_DATA.districts;
+    INDICATORS=meta.indicators;
+    EXISTING=meta.existing_scores;
+    FRESH=meta.fresh_scores;
+
+    // Merge chunk data
+    [c1,c2,c3].forEach(function(c){
+      Object.keys(c.districts).forEach(function(d){
+        if(!DISTRICTS[d]) DISTRICTS[d]={};
+        Object.assign(DISTRICTS[d], c.districts[d]);
+      });
+    });
+
+    // *** APPLY GOAL 7 CORRECTION ***
+    // Replace the incorrect raw-percentage Goal 7 values with normalised values from Excel
+    Object.keys(GOAL7_CORRECTED).forEach(function(dist){
+      if(DISTRICTS[dist]){
+        Object.assign(DISTRICTS[dist], GOAL7_CORRECTED[dist]);
+      }
+    });
+
+    // Build GOALS list
+    var seen={};
+    INDICATORS.forEach(function(i){if(!seen[i.goal]){seen[i.goal]=1;GOALS.push(i.goal);}});
+    GOALS.sort(function(a,b){return parseInt(a.split(' ')[1])-parseInt(b.split(' ')[1]);});
+
+    setLoad(100,'Ready');
+    setTimeout(function(){
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('pg0').classList.add('active');
+      renderLensCards();
+      setST('existing');
+    },300);
+  }).catch(function(e){
+    document.getElementById('load-txt').textContent='Error loading data: '+e.message+' — check browser console';
+    document.getElementById('load-txt').style.color='#c04040';
+    console.error('Fetch failed:', e);
+  });
+}
+
+function setLoad(p,t){
+  document.getElementById('load-fill').style.width=p+'%';
+  document.getElementById('load-txt').textContent=t;
+}
+
+// ─── NAVIGATION ─────────────────────────────────────────────────────────────
+function goTo(n){
+  if(n>=1 && selLensId===null) return;
+  document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===n);});
+  document.querySelectorAll('.step').forEach(function(s,i){
+    s.classList.remove('active','done');
+    if(i<n) s.classList.add('done');
+    else if(i===n) s.classList.add('active');
+  });
+  window.scrollTo(0,0);
+  if(n===1) renderData();
+  if(n===2) renderBreak();
+  if(n===3) renderBaseline();
+}
+
+// ─── PAGE 0: LENS CARDS ─────────────────────────────────────────────────────
+function renderLensCards(){
+  document.getElementById('lens-grid').innerHTML=LENSES.map(function(l){
+    return '<div class="lcard" id="lc'+l.id+'" onclick="pickLens('+l.id+')">' +
+    '<div class="lcard-num">LENS '+(l.id+1)+' OF 6</div>' +
+    '<div class="lcard-title">'+l.title+'</div>' +
+    '<div class="lcard-story">'+l.story+'</div>' +
+    '<div class="lcard-formula"><div style="font-size:8px;color:var(--muted);margin-bottom:2px;letter-spacing:1px">FORMULA (LOCKED)</div>'+l.formula+'</div>' +
+    '<div class="lcard-locked">&#128274; Weights: '+l.weights+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+function pickLens(id){
+  selLensId=id;
+  document.querySelectorAll('.lcard').forEach(function(c){c.classList.remove('sel');});
+  document.getElementById('lc'+id).classList.add('sel');
+  document.getElementById('btn-p1').disabled=false;
+  poolLocked=false; lockedPoolA=[]; lockedPoolB=[];
+  document.getElementById('pool-bar').classList.remove('vis');
+}
+
+// ─── PAGE 1: DATA REVIEW ────────────────────────────────────────────────────
+function renderData(){
+  var l=LENSES[selLensId];
+  document.getElementById('p1-bar').innerHTML='<strong>Active Lens:</strong> '+l.title+' &middot; Formula: '+l.fplain;
+  document.getElementById('dt-head').innerHTML='<tr><th>District</th>' +
+    l.vars.map(function(v){return '<th class="vc">'+v.lbl+'<br><span style="font-size:7px;opacity:.7">wt:'+Math.round(v.w*100)+'% | '+v.src+'</span></th>';}).join('') +
+    '<th>Lens Score</th><th>Status</th></tr>';
+  document.getElementById('dt-body').innerHTML=CAT_DISTRICTS.map(function(d,i){
+    var N=buildNorm();
+    var score=l.score(d,N);
+    var cells=l.vars.map(function(v){
+      var val=v.k==='urban_pct'?d.urban_pct.toFixed(2):d[v.k];
+      return '<td><input type="number" step="0.01" class="'+(d.is_new?'isnew':'')+'" value="'+val+'" '+
+        'onchange="updCat('+i+',\''+v.k+'\',this.value)" oninput="this.classList.add(\'edited\')"></td>';
+    }).join('');
+    var status=d.is_new
+      ?'<span style="color:#c04040;font-size:10px">Estimated &mdash; excluded from ranking</span>'
+      :d.has_ind_data
+        ?'<span style="color:var(--teal);font-size:10px">Full data</span>'
+        :'<span style="color:#c04040;font-size:10px">No indicator data</span>';
+    return '<tr><td class="dn">'+d.name+'</td>'+cells+
+      '<td style="font-family:\'JetBrains Mono\',monospace;font-size:11px;font-weight:700;color:var(--ey-dk)">'+score.toFixed(1)+'</td>'+
+      '<td>'+status+'</td></tr>';
+  }).join('');
+}
+
+function updCat(i,k,v){
+  var p=parseFloat(v);
+  if(!isNaN(p)){
+    CAT_DISTRICTS[i][k]=p;
+    if(k==='urban_pop'||k==='pop') CAT_DISTRICTS[i].urban_pct=CAT_DISTRICTS[i].urban_pop/CAT_DISTRICTS[i].pop*100;
+    renderData();
+  }
+}
+
+// ─── PAGE 2: BREAK & POOLS ──────────────────────────────────────────────────
+function renderBreak(){
+  var l=LENSES[selLensId];
+  scoredAll=catScores(l);
+  var jb=jenks(scoredAll);
+  naturalBreakIdx=jb.ci; naturalGap=jb.gap; breakIdx=jb.ci;
+  document.getElementById('br-slider').max=scoredAll.length-1;
+  document.getElementById('br-slider').value=breakIdx;
+  document.getElementById('br-score').value=scoredAll[breakIdx-1]?scoredAll[breakIdx-1].score.toFixed(1):'';
+  updBreak();
+}
+
+function setBreak(src,val){
+  if(src==='slider'){
+    breakIdx=parseInt(val);
+    document.getElementById('br-score').value=scoredAll[breakIdx-1]?scoredAll[breakIdx-1].score.toFixed(1):'';
+  } else if(src==='score'){
+    var sc=parseFloat(val); if(isNaN(sc)) return;
+    var idx=scoredAll.findIndex(function(d){return d.score<sc;});
+    breakIdx=idx===-1?scoredAll.length:idx;
+    document.getElementById('br-slider').value=breakIdx;
+  } else if(src==='click'){
+    breakIdx=parseInt(val);
+    document.getElementById('br-slider').value=breakIdx;
+    document.getElementById('br-score').value=scoredAll[breakIdx-1]?scoredAll[breakIdx-1].score.toFixed(1):'';
+  }
+  updBreak();
+}
+
+function resetBreak(){
+  breakIdx=naturalBreakIdx;
+  document.getElementById('br-slider').value=breakIdx;
+  document.getElementById('br-score').value=scoredAll[breakIdx-1]?scoredAll[breakIdx-1].score.toFixed(1):'';
+  updBreak();
+}
+
+function updBreak(){
+  var pA=scoredAll.slice(0,breakIdx), pB=scoredAll.slice(breakIdx);
+  var isNat=breakIdx===naturalBreakIdx;
+  var curGap=breakIdx>0&&breakIdx<scoredAll.length?(scoredAll[breakIdx-1].score-scoredAll[breakIdx].score).toFixed(1):'–';
+  var maxS=scoredAll[0].score;
+  var l=LENSES[selLensId];
+
+  document.getElementById('bc-sug-txt').innerHTML=
+    'Suggested: Pool A = top <strong>'+naturalBreakIdx+'</strong> of 33 | Gap = <strong>'+naturalGap.toFixed(1)+'</strong> pts | '+
+    (isNat?'<span style="color:var(--teal)">At suggested break</span>':'<span style="color:var(--amber)">Manually adjusted</span>');
+
+  // Update structural reasoning
+  var reasonHtml=l.reasoning(scoredAll,breakIdx);
+  document.getElementById('reason-txt').innerHTML=reasonHtml;
+
+  var rows=scoredAll.map(function(d,i){
+    var inA=i<breakIdx, isBreak=i===breakIdx;
+    return '<tr style="'+(isBreak?'border-top:3px solid var(--ey);':'')+' cursor:pointer;" '+
+      'onclick="setBreak(\'click\','+(i+1)+')">' +
+      '<td class="rk '+(i<3?'g':'')+'"> #'+(i+1)+'</td>' +
+      '<td style="font-weight:600">'+d.name+'</td>' +
+      '<td><div class="bw"><div class="bf" style="width:'+(d.score/maxS*100)+'%;background:'+(inA?'var(--teal)':'#6a8ab8')+'"></div></div></td>' +
+      '<td style="font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:600;color:'+(inA?'var(--teal)':'#6a8ab8')+'">'+d.score.toFixed(1)+'</td>' +
+      '<td><span style="padding:2px 7px;border-radius:10px;font-size:9px;font-family:\'JetBrains Mono\',monospace;'+
+        'background:'+(inA?'#b0dcc0':'#a8c8e0')+';color:'+(inA?'var(--green)':'var(--blue)')+'">Pool '+(inA?'A':'B')+'</span></td>' +
+      '</tr>';
+  }).join('');
+  document.getElementById('break-tbl').innerHTML=
+    '<thead><tr><th>Rank</th><th>District</th><th></th><th>Score</th><th>Pool</th></tr></thead><tbody>'+rows+'</tbody>';
+
+  document.getElementById('pool-preview').innerHTML=
+    '<div class="pool-card pA"><div class="pc-hdr"><div class="pc-label">Pool A</div><span class="pc-count">'+pA.length+'</span></div>'+
+    '<div class="pc-chips">'+pA.map(function(d){return '<span class="pc-chip">'+d.name+'</span>';}).join('')+'</div></div>'+
+    '<div class="pool-card pB"><div class="pc-hdr"><div class="pc-label">Pool B</div><span class="pc-count">'+pB.length+'</span></div>'+
+    '<div class="pc-chips">'+pB.map(function(d){return '<span class="pc-chip">'+d.name+'</span>';}).join('')+'</div></div>';
+
+  var pAn=pA.map(function(d){return d.name;}).join(', ');
+  var pBn=pB.map(function(d){return d.name;}).join(', ');
+  var bm=isNat?'the Jenks Natural Break classification (largest score gap in the distribution)':'expert review, manually adjusted from the automatic suggestion';
+
+  document.getElementById('jp-txt').innerHTML=
+    '<p style="margin-bottom:8px">"The 33 rankable districts of Assam were divided using the <strong>'+l.title+'</strong> approach. Formula: '+l.fplain+'.</p>'+
+    '<p style="margin-bottom:8px">'+l.plainLogic+'</p>'+
+    '<p>The pool boundary was determined using '+bm+', producing a gap of '+curGap+' points at the break. Data sourced from the Statistical Handbook Assam 2025."</p>';
+
+  document.getElementById('jt-txt').innerHTML=
+    '<div class="jt-sec"><div class="jt-lbl">Lens</div><div>'+l.title+'</div></div>'+
+    '<div class="jt-sec"><div class="jt-lbl">Formula</div><div>'+l.fplain+'</div></div>'+
+    '<div class="jt-sec"><div class="jt-lbl">Weighting</div><div>'+l.weights+' (50-30-20 locked structure)</div></div>'+
+    '<div class="jt-sec"><div class="jt-lbl">Normalisation</div><div>Min-max normalisation (0–100) across all 35 districts</div></div>'+
+    '<div class="jt-sec"><div class="jt-lbl">Break Method</div><div>'+bm+'. Gap: '+curGap+' pts</div></div>'+
+    '<div class="jt-sec"><div class="jt-lbl">Sources</div><div>'+l.vars.map(function(v){return v.lbl+': '+v.src;}).join(' | ')+'</div></div>'+
+    '<div class="jt-sec"><div class="jt-lbl">Result</div>'+
+    '<div><strong>Pool A ('+pA.length+'):</strong> '+pAn+'<br><strong>Pool B ('+pB.length+'):</strong> '+pBn+'</div></div>';
+}
+
+function showJust(t){
+  document.querySelectorAll('.jtab').forEach(function(j,i){j.classList.toggle('active',['plain','tech'][i]===t);});
+  document.getElementById('just-plain').classList.toggle('active',t==='plain');
+  document.getElementById('just-tech').classList.toggle('active',t==='tech');
+}
+
+function copyJ(t){
+  var el=document.getElementById(t==='plain'?'jp-txt':'jt-txt');
+  if(navigator.clipboard) navigator.clipboard.writeText(el.innerText).catch(function(){});
+  var b=el.parentElement.querySelector('.copy-btn');
+  b.textContent='Copied!'; setTimeout(function(){b.textContent='Copy';},2000);
+}
+
+function lockAndGo(){
+  lockedPoolA=scoredAll.slice(0,breakIdx).map(function(d){return d.name;});
+  lockedPoolB=scoredAll.slice(breakIdx).map(function(d){return d.name;});
+  poolLocked=true;
+  document.getElementById('pool-bar').classList.add('vis');
+  document.getElementById('pb-val').textContent=
+    'Pool A: '+lockedPoolA.length+' | Pool B: '+lockedPoolB.length+' | Lens: '+LENSES[selLensId].title;
+  goTo(3);
+}
+
+function dlCat(){
+  var lines=['"DIF Categorisation"','"Lens: '+LENSES[selLensId].title+'"','"Formula: '+LENSES[selLensId].fplain+'"','"Weights: '+LENSES[selLensId].weights+'"','"Generated: '+new Date().toLocaleDateString('en-IN')+'"','','"Rank","District","Score","Pool"'];
+  scoredAll.forEach(function(d,i){
+    lines.push('"'+(i+1)+'","'+d.name+'","'+d.score.toFixed(2)+'",'+(i<breakIdx?'"Pool A"':'"Pool B"'));
+  });
+  dl(lines.join('\n'),'DIF_Categorisation.csv','text/csv');
+}
+
+// ─── PAGE 3: BASELINE RANKING ───────────────────────────────────────────────
+// CRITICAL FIX: Use DIF_COMPOSITE as single source of truth for existing scores
+// Fresh equal-weight uses all 84 indicator data (with Goal 7 corrected)
+function calcScore(dist,inc){
+  if(!inc){
+    if(scoreType==='existing'){
+      // Use the authoritative DIF composite score directly from xlsm
+      return DIF_COMPOSITE[dist] || EXISTING[dist] || 0;
+    } else {
+      return FRESH[dist] || 0;
+    }
+  }
+// NITI Aayog methodology:
+// 1) Average indicators within each goal
+// 2) Average the goal scores (equal weight to each goal)
+
+var dS = DISTRICTS[dist] || {};
+var goalScores = [];
+
+GOALS.forEach(function(g){
+    var gVals = [];
+    INDICATORS.forEach(function(i){
+        if(i.goal === g && inc[i.name]){
+            var v = dS[i.name];
+            if(v !== undefined && v !== null) gVals.push(v);
+        }
+    });
+
+    if(gVals.length){
+        goalScores.push(
+            gVals.reduce(function(s,v){ return s + v; }, 0) / gVals.length
+        );
+    }
+});
+
+return goalScores.length
+    ? Math.round(
+        goalScores.reduce(function(s,v){ return s + v; }, 0)
+        / goalScores.length * 100
+      ) / 100
+    : 0;
+}
+
+function rankPool(pool,inc){
+  var r=pool.map(function(d){return {name:d, score:calcScore(d,inc)};});
+  r.sort(function(a,b){return b.score-a.score;});
+  r.forEach(function(d,i){d.rank=i+1;});
+  return r;
+}
+
+function setST(t){
+  scoreType=t;
+  var eStyle=t==='existing'?'background:var(--ink);color:#f0ece4;':'background:var(--surface);color:var(--muted);border:1px solid var(--border);';
+  var fStyle=t==='fresh'?'background:var(--ink);color:#f0ece4;':'background:var(--surface);color:var(--muted);border:1px solid var(--border);';
+  document.getElementById('ss-e').style.cssText=eStyle;
+  document.getElementById('ss-f').style.cssText=fStyle;
+  if(poolLocked) renderBaseline();
+}
+
+function mkPoolTable(ranked,poolName,poolColor){
+  var maxS=Math.max.apply(null,ranked.map(function(d){return d.score;}));
+  var avg=(ranked.reduce(function(s,d){return s+d.score;},0)/ranked.length).toFixed(1);
+  var counts=[0,0,0,0];
+  ranked.forEach(function(d){
+    if(d.score===100) counts[3]++;
+    else if(d.score>=65) counts[2]++;
+    else if(d.score>=50) counts[1]++;
+    else counts[0]++;
+  });
+  var rows=ranked.map(function(d,i){
+    var col=sdgColor(d.score), tc=sdgTC(d.score);
+    return '<tr>'+
+      '<td class="rk '+(i<3?'g':'')+'"> #'+d.rank+'</td>'+
+      '<td style="font-weight:600">'+d.name+'</td>'+
+      '<td><div class="bw"><div class="bf" style="width:'+(d.score/maxS*100)+'%;background:'+col+'"></div></div></td>'+
+      '<td style="font-family:\'JetBrains Mono\',monospace;font-size:11px;font-weight:700;color:'+col+'">'+d.score.toFixed(2)+'</td>'+
+      '<td><span class="sdg-badge" style="background:'+col+';color:'+tc+'">'+sdgLabel(d.score)+'</span></td>'+
+      '</tr>';
+  }).join('');
+  return '<div>'+
+    '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:'+poolColor+';margin-bottom:6px;font-weight:700">'+poolName+'</div>'+
+    '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">'+
+    [['Avg: '+avg,'var(--teal)'],['Aspirant: '+counts[0],'#DD1E47'],['Performer: '+counts[1],'#a07000'],['Front Runner: '+counts[2],'#00A084'],['Achiever: '+counts[3],'#00AEEF']].map(function(s){
+      return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:10px;color:'+s[1]+';font-weight:700">'+s[0]+'</div>';
+    }).join('')+
+    '</div>'+
+    '<div class="rank-wrap"><table class="rtbl">'+
+    '<thead><tr><th>Rank</th><th>District</th><th></th><th>Score</th><th>Category</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody></table></div>'+
+    '</div>';
+}
+
+function renderBaseline(){
+  if(!poolLocked) return;
+  baseRankedA=rankPool(lockedPoolA,null);
+  baseRankedB=rankPool(lockedPoolB,null);
+  document.getElementById('both-pools').innerHTML=
+    mkPoolTable(baseRankedA,'POOL A ('+lockedPoolA.length+' districts)','var(--green)')+
+    mkPoolTable(baseRankedB,'POOL B ('+lockedPoolB.length+' districts)','var(--blue)');
+}
+
+function dlBoth(){
+  var lines=['"DIF Baseline Ranking"','"Scoring: '+(scoreType==='existing'?'Existing DIF Final Score (source: DIF_indexing_draft1_13.02.2026.xlsm)':'Fresh Equal-Weight')+'"','"Generated: '+new Date().toLocaleDateString('en-IN')+'"','','"POOL A"','"Rank","District","Score","SDG Category"'];
+  baseRankedA.forEach(function(d){lines.push('"'+d.rank+'","'+d.name+'","'+d.score.toFixed(4)+'","'+sdgLabel(d.score)+'"');});
+  lines.push('','"POOL B"','"Rank","District","Score","SDG Category"');
+  baseRankedB.forEach(function(d){lines.push('"'+d.rank+'","'+d.name+'","'+d.score.toFixed(4)+'","'+sdgLabel(d.score)+'"');});
+  dl(lines.join('\n'),'DIF_Baseline_BothPools.csv','text/csv');
+}
+
+function confirmBaseline(){
+  targetRankedA=baseRankedA.map(function(d){return {name:d.name,score:d.score,rank:d.rank};});
+  targetRankedB=baseRankedB.map(function(d){return {name:d.name,score:d.score,rank:d.rank};});
+  renderDrags();
+  goTo(4);
+}
+
+// ─── PAGE 4: TARGET RANKING ─────────────────────────────────────────────────
+function renderDragList(targetRanked, baseRanked, elId, pool){
+  var bm={};
+  baseRanked.forEach(function(d){bm[d.name]=d.rank;});
+  document.getElementById(elId).innerHTML=targetRanked.map(function(d,i){
+    var base=bm[d.name]||(i+1), diff=base-(i+1);
+    var dc=diff>0?'cu':diff<0?'cd':'cn';
+    var ds=diff>0?('↑'+diff):diff<0?('↓'+Math.abs(diff)):'—';
+    return '<div class="drag-item" draggable="true" data-n="'+d.name+'" data-pool="'+pool+'" '+
+      'ondragstart="ds(event)" ondragover="dov(event)" ondrop="ddr(event)" ondragleave="dlv(event)">'+
+      '<span class="di-h">⠿</span>'+
+      '<span class="di-r">#'+(i+1)+'</span>'+
+      '<span class="di-n">'+d.name+'</span>'+
+      '<span class="di-b">was #'+base+'</span>'+
+      '<span class="di-c '+dc+'">'+ds+'</span>'+
+      '<span class="di-btns">'+
+        '<button class="di-btn" onclick="moveItem(\''+pool+'\','+i+',-1)" title="Move up">▲</button>'+
+        '<button class="di-btn" onclick="moveItem(\''+pool+'\','+i+',1)" title="Move down">▼</button>'+
+      '</span>'+
+      '</div>';
+  }).join('');
+}
+
+function moveItem(pool, idx, dir){
+  var target=pool==='A'?targetRankedA:targetRankedB;
+  var newIdx=idx+dir;
+  if(newIdx<0||newIdx>=target.length) return;
+  var tmp=target[idx]; target[idx]=target[newIdx]; target[newIdx]=tmp;
+  target.forEach(function(d,i){d.rank=i+1;});
+  renderDrags();
+}
+
+function renderDrags(){
+  renderDragList(targetRankedA,baseRankedA,'drag-A','A');
+  renderDragList(targetRankedB,baseRankedB,'drag-B','B');
+}
+
+function resetTargets(){
+  targetRankedA=baseRankedA.map(function(d){return {name:d.name,score:d.score,rank:d.rank};});
+  targetRankedB=baseRankedB.map(function(d){return {name:d.name,score:d.score,rank:d.rank};});
+  renderDrags();
+}
+
+var dragSrc=null;
+function ds(e){dragSrc=e.currentTarget; e.currentTarget.classList.add('dragging');}
+function dov(e){e.preventDefault(); e.currentTarget.classList.add('over');}
+function dlv(e){e.currentTarget.classList.remove('over');}
+function ddr(e){
+  e.preventDefault();
+  var t=e.currentTarget; t.classList.remove('over');
+  if(!dragSrc||dragSrc===t) return;
+  var pool=dragSrc.dataset.pool;
+  var target=pool==='A'?targetRankedA:targetRankedB;
+  var si=target.findIndex(function(d){return d.name===dragSrc.dataset.n;});
+  var ti=target.findIndex(function(d){return d.name===t.dataset.n;});
+  if(si!==-1&&ti!==-1){
+    var item=target.splice(si,1)[0];
+    target.splice(ti,0,item);
+    target.forEach(function(d,i){d.rank=i+1;});
+  }
+  dragSrc.classList.remove('dragging'); dragSrc=null;
+  renderDrags();
+}
+
+// ─── PAGE 5: OPTIMISER ──────────────────────────────────────────────────────
+function spearman(a,b){
+  var n=a.length; if(n<2) return 100;
+  var ma={},mb={};
+  a.forEach(function(d,i){ma[d.name]=i+1;});
+  b.forEach(function(d,i){mb[d.name]=i+1;});
+  var d2=a.reduce(function(s,d){return s+Math.pow((ma[d.name]||0)-(mb[d.name]||0),2);},0);
+  return Math.round((1-6*d2/(n*(n*n-1)))*1000)/10;
+}
+
+function arrEq(a,b){
+  if(a.length!==b.length) return false;
+  for(var i=0;i<a.length;i++) if(a[i].name!==b[i].name) return false;
+  return true;
+}
+
+function copyObj(o){
+  var r={}; Object.keys(o).forEach(function(k){r[k]=o[k];}); return r;
+}
+
+function goalConstraintOK(inc){
+  return GOALS.every(function(g){
+    return INDICATORS.some(function(i){return i.goal===g&&inc[i.name];});
+  });
+}
+
+function combinedMatch(inc){
+  var rA=rankPool(lockedPoolA,inc);
+  var rB=rankPool(lockedPoolB,inc);
+  var mA=spearman(targetRankedA,rA);
+  var mB=spearman(targetRankedB,rB);
+  return {mA:mA,mB:mB,combined:Math.round((mA+mB)/2*10)/10,rA:rA,rB:rB};
+}
+
+function runOpt(){
+  permResults=[]; selPermIdx=null;
+  document.getElementById('opt-run').classList.remove('hidden');
+  document.getElementById('opt-res').classList.add('hidden');
+  document.getElementById('opt-fbk').classList.add('hidden');
+  document.getElementById('acc-detail').classList.add('hidden');
+  setTimeout(doOpt,150);
+}
+
+function doOpt(){
+  var curA=rankPool(lockedPoolA,null);
+  var curB=rankPool(lockedPoolB,null);
+
+  if(arrEq(targetRankedA,curA)&&arrEq(targetRankedB,curB)){
+    document.getElementById('opt-run').classList.add('hidden');
+    var allSet={};
+    INDICATORS.forEach(function(i){allSet[i.name]=true;});
+    var m=combinedMatch(allSet);
+    permResults=[{removed:[],includedSet:allSet,ic:INDICATORS.length,
+      mA:m.mA,mB:m.mB,match:100,rA:m.rA,rB:m.rB,
+      label:'All indicators — target matches baseline exactly'}];
+    showRes(true);
+    return;
+  }
+
+  var MIN_IND=50;
+  var inc={};
+  INDICATORS.forEach(function(i){inc[i.name]=true;});
+  var incList=INDICATORS.map(function(i){return i.name;});
+  var stages=[];
+  var m0=combinedMatch(inc);
+  var bm=m0.combined;
+  stages.push({removed:[],includedSet:copyObj(inc),ic:incList.length,
+    mA:m0.mA,mB:m0.mB,match:bm,rA:m0.rA,rB:m0.rB,
+    label:'All '+INDICATORS.length+' indicators'});
+
+  var round=0, noImprov=0;
+
+  function runRound(){
+    if(bm>=100||incList.length<=MIN_IND||noImprov>=8){
+      document.getElementById('opt-run').classList.add('hidden');
+      stages.sort(function(a,b){return b.match-a.match;});
+      permResults=stages.slice(0,10);
+      showRes(false);
+      return;
+    }
+    round++;
+    var pct=Math.min(95,Math.round((84-incList.length)/(84-MIN_IND)*95));
+    document.getElementById('opt-prog').style.width=pct+'%';
+    document.getElementById('opt-lbl').textContent=
+      'Round '+round+' | '+incList.length+' indicators remaining | current match: '+bm+'% | target: 100%';
+
+    var bestM=bm, bestR=null;
+    for(var i=0;i<incList.length;i++){
+      var n=incList[i];
+      inc[n]=false;
+      if(goalConstraintOK(inc)&&(incList.length-1)>=MIN_IND){
+        var tm=combinedMatch(inc).combined;
+        if(tm>bestM){bestM=tm; bestR=n;}
+      }
+      inc[n]=true;
+    }
+
+    if(bestR!==null){
+      noImprov=0;
+      inc[bestR]=false;
+      incList=incList.filter(function(n){return n!==bestR;});
+      bm=bestM;
+      var rem=INDICATORS.filter(function(i){return !inc[i.name];}).map(function(i){return i.name;});
+      var mm=combinedMatch(inc);
+      stages.push({removed:rem.slice(),includedSet:copyObj(inc),ic:incList.length,
+        mA:mm.mA,mB:mm.mB,match:mm.combined,rA:mm.rA,rB:mm.rB,
+        label:'Kept '+incList.length+' indicators | match: '+mm.combined+'%'});
+    } else {
+      noImprov++;
+    }
+    setTimeout(runRound,0);
+  }
+  runRound();
+}
+
+function showRes(isExact){
+  var best=permResults[0];
+  var fbk=document.getElementById('opt-fbk');
+  fbk.className='ib '+(best.match>=80?'ib-green':'ib-amber');
+  fbk.classList.remove('hidden');
+  if(isExact){
+    fbk.innerHTML='All 84 indicators confirmed. Target matches baseline exactly.';
+  } else if(best.match>=100){
+    fbk.innerHTML='100% match achieved! Select the result below to view and download.';
+  } else if(best.match>=80){
+    fbk.innerHTML='Best match: '+best.match+'%. Could not reach 100% — showing top 10 results. Select one to review.';
+  } else {
+    fbk.innerHTML='Best match: '+best.match+'%. Target is difficult to achieve through indicator removal alone. Consider adjusting targets in Step 5.';
+  }
+
+  document.getElementById('opt-stats').innerHTML=[
+    {v:permResults.length, l:'Results',     c:'var(--ink)'},
+    {v:best.match+'%',     l:'Best Match',  c:'var(--green)'},
+    {v:best.mA+'%',        l:'Pool A',      c:'var(--teal)'},
+    {v:best.mB+'%',        l:'Pool B',      c:'var(--blue)'},
+    {v:best.ic,            l:'Kept (Best)', c:'var(--teal)'},
+    {v:(84-best.ic),       l:'Removed',     c:'#c04040'}
+  ].map(function(s){
+    return '<div class="sc-chip"><div class="sc-val" style="color:'+s.c+'">'+s.v+'</div><div class="sc-lbl">'+s.l+'</div></div>';
+  }).join('');
+
+  document.getElementById('perm-cards').innerHTML=permResults.map(function(p,i){
+    var col=p.match>=80?'var(--green)':p.match>=60?'var(--ey-dk)':'#c04040';
+    return '<div class="perm-card'+(i===0?' best':'')+'" id="pc'+i+'" onclick="selPerm('+i+')">'+
+      '<div class="pc-h">'+
+      '<div>'+
+      '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--muted)">'+(i===0?'★ BEST':'#'+(i+1))+'</div>'+
+      '<div style="font-size:12px;color:var(--ink2);margin-top:2px"><strong>'+p.label+'</strong></div>'+
+      '</div>'+
+      '<div style="text-align:right">'+
+      '<div class="pc-m" style="color:'+col+'">'+p.match+'%</div>'+
+      '<div style="font-size:9px;color:var(--muted)">combined</div>'+
+      '</div>'+
+      '</div>'+
+      '<div class="mbar"><div class="mfill" style="width:'+Math.max(0,p.match)+'%;background:linear-gradient(90deg,var(--teal),var(--ey))"></div></div>'+
+      '<div class="pc-g4">'+
+      '<div class="pc-s"><b>'+p.ic+'</b>Kept</div>'+
+      '<div class="pc-s"><b style="color:#c04040">'+(84-p.ic)+'</b>Removed</div>'+
+      '<div class="pc-s"><b style="color:var(--teal)">'+p.mA+'%</b>Pool A</div>'+
+      '<div class="pc-s"><b style="color:var(--blue)">'+p.mB+'%</b>Pool B</div>'+
+      '</div>'+
+      '</div>';
+  }).join('');
+
+  document.getElementById('opt-res').classList.remove('hidden');
+}
+
+function selPerm(idx){
+  selPermIdx=idx;
+  document.querySelectorAll('.perm-card').forEach(function(c,i){c.classList.toggle('sel',i===idx);});
+  var p=permResults[idx];
+  var kI=INDICATORS.filter(function(i){return p.includedSet[i.name];});
+  var rI=INDICATORS.filter(function(i){return !p.includedSet[i.name];});
+  document.getElementById('kept-lbl').textContent='Indicators Kept ('+kI.length+')';
+  document.getElementById('rem-lbl').textContent='Indicators Removed ('+rI.length+')';
+
+  function byG(inds){
+    var g={};
+    inds.forEach(function(i){if(!g[i.goal]) g[i.goal]=[]; g[i.goal].push(i);});
+    return g;
+  }
+  var kG=byG(kI);
+  document.getElementById('kept-list').innerHTML=GOALS.filter(function(g){return kG[g];}).map(function(g){
+    return '<div style="margin-bottom:8px"><strong style="color:var(--green);font-size:10px">'+g+'</strong><br>'+
+      kG[g].map(function(i){return '<span>• '+i.name+'</span>';}).join('<br>')+'</div>';
+  }).join('');
+  var rG=byG(rI);
+  document.getElementById('rem-list').innerHTML=rI.length
+    ?GOALS.filter(function(g){return rG[g];}).map(function(g){
+        return '<div style="margin-bottom:8px"><strong style="font-size:10px">'+g+'</strong><br>'+
+          rG[g].map(function(i){return '<span style="color:#c04040">• '+i.name+'</span>';}).join('<br>')+'</div>';
+      }).join('')
+    :'<em style="color:var(--muted)">No indicators removed</em>';
+
+  function fillCmp(tgtEl,resEl,target,ranked){
+    var tgtHtml='', resHtml='';
+    for(var i=0;i<target.length;i++){
+      var tgt=target[i];
+      var res=ranked[i];
+      var match=res&&tgt.name===res.name;
+      var bg=match?'background:rgba(0,160,132,.08);':'';
+      tgtHtml+='<div style="padding:2px 0;'+bg+'">'+
+        '<strong style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--muted)">#'+(i+1)+'</strong> '+tgt.name+'</div>';
+      if(res){
+        var dc=match?'color:var(--teal)':'color:#c04040';
+        resHtml+='<div style="padding:2px 0;'+bg+';'+dc+'">'+
+          '<strong style="font-family:\'JetBrains Mono\',monospace;font-size:9px">#'+res.rank+'</strong> '+res.name+(match?' ✓':'')+'</div>';
+      }
+    }
+    document.getElementById(tgtEl).innerHTML=tgtHtml;
+    document.getElementById(resEl).innerHTML=resHtml;
+  }
+  fillCmp('cmp-tgt-A','cmp-res-A',targetRankedA,p.rA);
+  fillCmp('cmp-tgt-B','cmp-res-B',targetRankedB,p.rB);
+
+  document.getElementById('acc-sum').innerHTML=
+    'Selected: <strong>'+p.match+'% combined match</strong> | Pool A: <strong>'+p.mA+'%</strong> | Pool B: <strong>'+p.mB+'%</strong> | '+
+    '<strong>'+p.ic+' kept</strong> | <strong>'+(84-p.ic)+' removed</strong>';
+  document.getElementById('acc-detail').classList.remove('hidden');
+}
+
+function dlExcel(){
+  if(selPermIdx===null){alert('Please select a result first');return;}
+  var p=permResults[selPermIdx];
+  var kI=INDICATORS.filter(function(i){return p.includedSet[i.name];});
+  var kG=[]; var sg={};
+  kI.forEach(function(i){if(!sg[i.goal]){sg[i.goal]=1;kG.push(i.goal);}});
+  kG.sort(function(a,b){return parseInt(a.split(' ')[1])-parseInt(b.split(' ')[1]);});
+
+  var lines=[
+    '"DIF Index — Optimised Indicator Framework"',
+    '"Lens: '+LENSES[selLensId].title+'"',
+    '"Score Source: DIF_indexing_draft1_13.02.2026.xlsm (Goal Sheet Final Score)"',
+    '"Match: Pool A '+p.mA+'% | Pool B '+p.mB+'% | Combined '+p.match+'%"',
+    '"Indicators Kept: '+p.ic+' of 84 | Removed: '+(84-p.ic)+'"',
+    '"Generated: '+new Date().toLocaleDateString('en-IN')+'"',
+    '"© Ernst & Young LLP"',
+    ''
+  ];
+
+  ['A','B'].forEach(function(pool){
+    var poolDistricts=pool==='A'?lockedPoolA:lockedPoolB;
+    var poolRanked=pool==='A'?p.rA:p.rB;
+    var rankMap={};
+    poolRanked.forEach(function(d){rankMap[d.name]=d.rank;});
+    var sortedDists=poolDistricts.slice().sort(function(a,b){return (rankMap[a]||99)-(rankMap[b]||99);});
+
+    lines.push('"=== POOL '+pool+' ==="','');
+    kG.forEach(function(goal){
+      var gI=kI.filter(function(i){return i.goal===goal;});
+      lines.push('"--- '+goal+' ('+gI.length+' indicators) ---"');
+      lines.push(['"District"'].concat(gI.map(function(i){return '"'+i.name+'"';})).concat(['"Goal Avg"','"SDG Category"']).join(','));
+      sortedDists.forEach(function(dist){
+        var dS=DISTRICTS[dist]||{};
+        var vals=gI.map(function(i){
+          var v=dS[i.name];
+          return (v!==undefined&&v!==null)?parseFloat(v.toFixed(2)):null;
+        });
+        var nv=vals.filter(function(v){return v!==null;});
+        var avg=nv.length?(nv.reduce(function(s,v){return s+v;},0)/nv.length).toFixed(2):null;
+        var row=['"'+dist+'"'].concat(vals.map(function(v){return v!==null?v:'"N/A"';}));
+        row.push(avg!==null?avg:'"N/A"','"'+sdgLabel(avg?parseFloat(avg):0)+'"');
+        lines.push(row.join(','));
+      });
+      lines.push('');
+    });
+    lines.push('"--- COMPOSITE SCORE — Pool '+pool+' (source: DIF_indexing_draft1_13.02.2026.xlsm) ---"','"Rank","District","DIF Score","SDG Category"');
+    poolRanked.forEach(function(d){
+      lines.push('"'+d.rank+'","'+d.name+'","'+d.score.toFixed(4)+'","'+sdgLabel(d.score)+'"');
+    });
+    lines.push('');
+  });
+
+  dl(lines.join('\n'),'DIF_Optimised_Framework.csv','text/csv');
+}
+
+// ─── DOWNLOAD HELPER ────────────────────────────────────────────────────────
+function dl(c,f,m){
+  var b=new Blob([c],{type:m}), u=URL.createObjectURL(b), a=document.createElement('a');
+  a.href=u; a.download=f; a.click();
+  setTimeout(function(){URL.revokeObjectURL(u);},1000);
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+loadData();
+</script>
+
+</body>
+</html>
