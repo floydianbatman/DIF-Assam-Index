@@ -922,35 +922,12 @@ function calcScore(dist,inc){
       return FRESH[dist] || 0;
     }
   }
-// NITI Aayog methodology:
-// 1) Average indicators within each goal
-// 2) Average the goal scores (equal weight to each goal)
-
-var dS = DISTRICTS[dist] || {};
-var goalScores = [];
-
-GOALS.forEach(function(g){
-    var gVals = [];
-    INDICATORS.forEach(function(i){
-        if(i.goal === g && inc[i.name]){
-            var v = dS[i.name];
-            if(v !== undefined && v !== null) gVals.push(v);
-        }
-    });
-
-    if(gVals.length){
-        goalScores.push(
-            gVals.reduce(function(s,v){ return s + v; }, 0) / gVals.length
-        );
-    }
-});
-
-return goalScores.length
-    ? Math.round(
-        goalScores.reduce(function(s,v){ return s + v; }, 0)
-        / goalScores.length * 100
-      ) / 100
-    : 0;
+  // For optimisation: compute mean of included indicators
+  var dS=DISTRICTS[dist]||{}, vals=[];
+  INDICATORS.forEach(function(i){
+    if(inc[i.name]){var v=dS[i.name]; if(v!==undefined&&v!==null) vals.push(v);}
+  });
+  return vals.length?Math.round(vals.reduce(function(s,v){return s+v;},0)/vals.length*100)/100:0;
 }
 
 function rankPool(pool,inc){
@@ -1166,57 +1143,7 @@ function doOpt(){
     if(bm>=100||incList.length<=MIN_IND||noImprov>=8){
       document.getElementById('opt-run').classList.add('hidden');
       stages.sort(function(a,b){return b.match-a.match;});
-      var recommended = stages.find(function(s){
-    return s.ic >= 50 && s.match < 100;
-});
-if (recommended) recommended.recommended = true;
-
       permResults=stages.slice(0,10);
-      // ── Exploratory 100% run (allowed below 50 indicators) ──
-var expInc = {};
-INDICATORS.forEach(function(i){ expInc[i.name] = true; });
-
-var expList = INDICATORS.map(function(i){ return i.name; });
-var expMatch = combinedMatch(expInc).combined;
-
-while (expMatch < 100 && expList.length > 1) {
-    var best = expMatch, remove = null;
-
-    for (var i = 0; i < expList.length; i++) {
-        var n = expList[i];
-        expInc[n] = false;
-
-        if (goalConstraintOK(expInc)) {
-            var m = combinedMatch(expInc).combined;
-            if (m > best) {
-                best = m;
-                remove = n;
-            }
-        }
-
-        expInc[n] = true;
-    }
-
-    if (!remove) break;
-
-    expInc[remove] = false;
-    expList = expList.filter(function(n){ return n !== remove; });
-    expMatch = best;
-}
-
-if (expMatch >= 99.9) {
-    var expRes = combinedMatch(expInc);
-    stages.push({
-        match: 100,
-        ic: expList.length,
-        mA: expRes.mA,
-        mB: expRes.mB,
-        rA: expRes.rA,
-        rB: expRes.rB,
-        exploratory: true,
-        label: 'Exploratory 100% match (below 50 indicators)'
-    });
-}
       showRes(false);
       return;
     }
@@ -1256,84 +1183,6 @@ if (expMatch >= 99.9) {
 }
 
 function showRes(isExact){
-// ---- REAL EXPLORATORY 100% RESULT (WITH INDICATOR TRACKING) ----
-if (!permResults.some(function(r){ return r.exploratory === true; })) {
-
-    // 1. Start with all indicators included
-    var exploratoryIncludedSet = {};
-    INDICATORS.forEach(function(ind){
-        exploratoryIncludedSet[ind.name] = true;
-    });
-
-    var indicatorList = INDICATORS.map(function(ind){
-        return ind.name;
-    });
-
-    var expMatch = combinedMatch(exploratoryIncludedSet).combined;
-    if (isNaN(expMatch)) expMatch = 0;
-
-    // 2. Remove indicators until match reaches ~100
-    while (expMatch < 99.9 && indicatorList.length > 1) {
-
-        var bestImprovement = expMatch;
-        var indicatorToRemove = null;
-
-        for (var i = 0; i < indicatorList.length; i++) {
-            var indName = indicatorList[i];
-            exploratoryIncludedSet[indName] = false;
-
-            if (goalConstraintOK(exploratoryIncludedSet)) {
-                var testMatch = combinedMatch(exploratoryIncludedSet).combined;
-                if (testMatch > bestImprovement) {
-                    bestImprovement = testMatch;
-                    indicatorToRemove = indName;
-                }
-            }
-
-            exploratoryIncludedSet[indName] = true;
-        }
-
-        if (!indicatorToRemove) break;
-
-        exploratoryIncludedSet[indicatorToRemove] = false;
-        indicatorList = indicatorList.filter(function(n){
-            return n !== indicatorToRemove;
-        });
-
-        expMatch = bestImprovement;
-    }
-
-    // 3. Compute removed indicators properly
-    var exploratoryRemoved = INDICATORS
-        .filter(function(ind){
-            return !exploratoryIncludedSet[ind.name];
-        })
-        .map(function(ind){
-            return ind.name;
-        });
-
-    var exploratoryResult = combinedMatch(exploratoryIncludedSet);
-
-    // 4. Push correct exploratory result
-    permResults.unshift({
-       
-        ic: indicatorList.length,
-        exploratory: true,
-        includedSet: exploratoryIncludedSet,
-        removed: exploratoryRemoved,
-        mA: exploratoryResult.mA,
-        mB: exploratoryResult.mB,
-        rA: exploratoryResult.rA,
-        rB: exploratoryResult.rB,
-       
-match: Math.round(exploratoryResult.combined * 10) / 10,
-label:
-    exploratoryResult.combined >= 99.95
-        ? 'Exploratory exact match (≈100%)'
-        : 'Exploratory best achievable match'
-
-    });
-}
   var best=permResults[0];
   var fbk=document.getElementById('opt-fbk');
   fbk.className='ib '+(best.match>=80?'ib-green':'ib-amber');
